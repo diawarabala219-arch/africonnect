@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#534AB7">
+<title>AfriConnect</title>
+<style>
+:root{--brand:#534AB7;--brand-d:#3b3390;--bg:#f1f0f8;--card:#fff;--ink:#1c1a33;--mut:#6b6987;--line:#e4e2f2;--soft:#eeecf9;--red:#d6336c}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button{font:inherit;cursor:pointer}
+.top{position:sticky;top:0;z-index:5;background:var(--brand);color:#fff;display:flex;align-items:center;gap:8px;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top))}
+.top h1{margin:0;font-size:20px;flex:1;letter-spacing:.2px}
+.top button{background:rgba(255,255,255,.18);color:#fff;border:0;border-radius:10px;padding:8px 12px;font-size:14px;font-weight:600}
+.wrap{max-width:620px;margin:0 auto;padding:12px 12px 80px}
+.card{background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 1px 2px rgba(40,30,100,.08)}
+.auth{max-width:420px;margin:8vh auto 0;padding:0 16px}
+.auth .logo{font-size:30px;font-weight:800;color:var(--brand);text-align:center;margin-bottom:4px}
+.auth p.sub{text-align:center;color:var(--mut);margin:0 0 16px}
+label{display:block;font-size:14px;font-weight:600;margin:10px 0 4px}
+input[type=text],input[type=email],input[type=password],textarea{width:100%;font:inherit;font-size:16px;padding:11px 12px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
+input:focus,textarea:focus{outline:none;border-color:var(--brand)}
+textarea{resize:none;min-height:70px}
+.btn{width:100%;background:var(--brand);color:#fff;border:0;border-radius:12px;padding:12px;font-weight:700;margin-top:14px}
+.btn:disabled{opacity:.55}
+.link{background:none;border:0;color:var(--brand);font-weight:700;padding:8px;width:100%;margin-top:6px}
+.err{color:var(--red);font-weight:600;font-size:14px;margin:10px 0 0;min-height:1em}
+.row{display:flex;gap:8px;align-items:center}
+.av{width:40px;height:40px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:800;flex:none}
+.name{font-weight:700}
+.time{font-size:13px;color:var(--mut)}
+.body{white-space:pre-wrap;word-wrap:break-word;margin:10px 0 0}
+.img{width:100%;border-radius:12px;margin-top:10px;display:block;max-height:520px;object-fit:cover;background:var(--soft)}
+.stats{font-size:13px;color:var(--mut);margin-top:10px}
+.acts{display:flex;border-top:1px solid var(--line);margin-top:10px;padding-top:6px;gap:6px}
+.acts button{flex:1;background:none;border:0;padding:9px;border-radius:10px;color:var(--mut);font-weight:700}
+.acts button.on{color:var(--brand)}
+.acts button:active{background:var(--soft)}
+.cm{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+.c{display:flex;gap:8px;margin-bottom:8px}
+.c .av{width:30px;height:30px;font-size:13px}
+.bub{background:var(--soft);border-radius:14px;padding:7px 11px;font-size:15px;word-wrap:break-word;min-width:0}
+.bub b{display:block;font-size:13px}
+.del{background:none;border:0;color:var(--mut);font-size:12px;padding:0 0 0 8px}
+.cin{display:flex;gap:6px}
+.cin input{flex:1}
+.cin button{background:var(--brand);color:#fff;border:0;border-radius:12px;padding:0 14px;font-weight:700}
+.tools{display:flex;gap:8px;align-items:center;margin-top:8px}
+.tools .ph{background:var(--soft);color:var(--brand);border:0;border-radius:10px;padding:9px 12px;font-weight:700}
+.tools .go{margin-left:auto;background:var(--brand);color:#fff;border:0;border-radius:10px;padding:9px 18px;font-weight:700}
+.tools .go:disabled{opacity:.5}
+.prev{position:relative;margin-top:8px}
+.prev img{width:100%;border-radius:12px;max-height:260px;object-fit:cover;display:block}
+.prev button{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:50%;width:30px;height:30px}
+.empty{text-align:center;color:var(--mut);padding:30px 10px}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+
+<div id="auth" class="auth hide">
+  <div class="card">
+    <div class="logo">AfriConnect</div>
+    <p class="sub" id="authSub">Connecte-toi pour retrouver tes amis.</p>
+    <div id="nameBox" class="hide"><label for="fName">Ton nom</label><input id="fName" type="text" maxlength="40" autocomplete="name"></div>
+    <label for="fMail">E-mail</label><input id="fMail" type="email" autocomplete="email" inputmode="email">
+    <label for="fPass">Mot de passe (6 caractères minimum)</label><input id="fPass" type="password" autocomplete="current-password">
+    <p class="err" id="authErr"></p>
+    <button class="btn" id="authGo" type="button">Se connecter</button>
+    <button class="link" id="authSwitch" type="button">Pas de compte ? Créer un compte</button>
+  </div>
+</div>
+
+<div id="app" class="hide">
+  <div class="top"><h1>AfriConnect</h1><button id="refresh" type="button">Actualiser</button><button id="logout" type="button">Sortir</button></div>
+  <div class="wrap">
+    <div class="card">
+      <div class="row"><div class="av" id="meAv">?</div><div class="name" id="meName"></div></div>
+      <textarea id="pBody" maxlength="2000" placeholder="Quoi de neuf à Conakry ?"></textarea>
+      <div class="prev hide" id="prev"><img id="prevImg" alt=""><button id="prevX" type="button" aria-label="Retirer la photo">×</button></div>
+      <div class="tools">
+        <button class="ph" id="pickBtn" type="button">📷 Photo</button>
+        <input id="file" type="file" accept="image/*" class="hide">
+        <button class="go" id="pubBtn" type="button">Publier</button>
+      </div>
+      <p class="err" id="pErr"></p>
+    </div>
+    <div id="feed"></div>
+  </div>
+</div>
+
+<div id="setup" class="auth hide"><div class="card"><div class="logo">AfriConnect</div><p class="sub">La base n'est pas encore reliée. Ajoute l'adresse et la clé Supabase dans le fichier reseau.html.</p></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+var SUPA_URL = "https://edsvhqwetulvypocdjku.supabase.co";
+var SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkc3ZocXdldHVsdnlwb2Nkamt1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzNzQ0OTcsImV4cCI6MjEwODk1MDQ5N30.0opGuYQPIc0hZQlUNlCk9h8kPXD-G4IdaAge2ioiKTM";
+
+var $ = function (id) { return document.getElementById(id); };
+var sb = null, me = null, myName = "", picked = null, mode = "login", busy = false;
+var open = {};
+
+function h(tag, props, kids) {
+  var e = document.createElement(tag);
+  for (var k in (props || {})) {
+    if (k === "text") e.textContent = props[k];
+    else if (k === "cls") e.className = props[k];
+    else if (k.slice(0, 2) === "on") e[k] = props[k];
+    else e.setAttribute(k, props[k]);
+  }
+  (kids || []).forEach(function (c) { if (c) e.appendChild(c); });
+  return e;
+}
+function ago(iso) {
+  var s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 60) return "à l'instant";
+  if (s < 3600) return Math.floor(s / 60) + " min";
+  if (s < 86400) return Math.floor(s / 3600) + " h";
+  if (s < 604800) return Math.floor(s / 86400) + " j";
+  return new Date(iso).toLocaleDateString("fr-FR");
+}
+function ini(n) { return (n || "?").trim().charAt(0).toUpperCase() || "?"; }
+function frErr(m) {
+  m = String(m || "");
+  if (/Invalid login/i.test(m)) return "E-mail ou mot de passe incorrect.";
+  if (/already registered|already been registered/i.test(m)) return "Cet e-mail a déjà un compte. Connecte-toi.";
+  if (/Password should be/i.test(m)) return "Mot de passe trop court (6 caractères minimum).";
+  if (/valid email|invalid format|Unable to validate email/i.test(m)) return "Adresse e-mail invalide.";
+  if (/rate limit|too many/i.test(m)) return "Trop d'essais. Réessaie dans quelques minutes.";
+  if (/Email not confirmed/i.test(m)) return "E-mail non confirmé : désactive « Confirm email » dans Supabase.";
+  if (/Failed to fetch|NetworkError|network/i.test(m)) return "Pas de connexion. Réessaie.";
+  return m || "Une erreur est survenue.";
+}
+
+function show(which) {
+  ["auth", "app", "setup"].forEach(function (k) { $(k).classList.toggle("hide", k !== which); });
+}
+
+/* ---------- Connexion / inscription ---------- */
+function setMode(m) {
+  mode = m;
+  var su = m === "signup";
+  $("nameBox").classList.toggle("hide", !su);
+  $("authGo").textContent = su ? "Créer mon compte" : "Se connecter";
+  $("authSwitch").textContent = su ? "J'ai déjà un compte" : "Pas de compte ? Créer un compte";
+  $("authSub").textContent = su ? "Crée ton compte gratuit en 30 secondes." : "Connecte-toi pour retrouver tes amis.";
+  $("fPass").autocomplete = su ? "new-password" : "current-password";
+  $("authErr").textContent = "";
+}
+async function doAuth() {
+  var mail = $("fMail").value.trim(), pass = $("fPass").value, nm = $("fName").value.trim();
+  $("authErr").textContent = "";
+  if (!mail || !pass) { $("authErr").textContent = "Remplis l'e-mail et le mot de passe."; return; }
+  if (mode === "signup" && nm.length < 2) { $("authErr").textContent = "Écris ton nom (2 lettres minimum)."; return; }
+  $("authGo").disabled = true;
+  try {
+    var r;
+    if (mode === "signup") r = await sb.auth.signUp({ email: mail, password: pass, options: { data: { name: nm } } });
+    else r = await sb.auth.signInWithPassword({ email: mail, password: pass });
+    if (r.error) throw r.error;
+    if (!r.data.session) { $("authErr").textContent = "Compte créé. Si rien ne se passe, désactive « Confirm email » dans Supabase."; return; }
+    await enter(r.data.session.user);
+  } catch (e) { $("authErr").textContent = frErr(e.message); }
+  finally { $("authGo").disabled = false; }
+}
+
+async function enter(user) {
+  me = user;
+  var r = await sb.from("profiles").select("name").eq("id", user.id).maybeSingle();
+  myName = (r.data && r.data.name) || (user.user_metadata && user.user_metadata.name) || "Membre";
+  $("meName").textContent = myName;
+  $("meAv").textContent = ini(myName);
+  show("app");
+  loadFeed();
+}
+
+/* ---------- Photos ---------- */
+function shrink(file, max) {
+  return new Promise(function (ok, ko) {
+    var url = URL.createObjectURL(file), im = new Image();
+    im.onload = function () {
+      var w = im.width, hh = im.height, k = Math.min(1, max / Math.max(w, hh));
+      var c = document.createElement("canvas"); c.width = Math.round(w * k); c.height = Math.round(hh * k);
+      c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      c.toBlob(function (b) { b ? ok(b) : ko(new Error("Photo illisible.")); }, "image/jpeg", 0.8);
+    };
+    im.onerror = function () { URL.revokeObjectURL(url); ko(new Error("Photo illisible.")); };
+    im.src = url;
+  });
+}
+function clearPick() { picked = null; $("file").value = ""; $("prev").classList.add("hide"); }
+
+async function publish() {
+  var body = $("pBody").value.trim();
+  $("pErr").textContent = "";
+  if (!body && !picked) { $("pErr").textContent = "Écris quelque chose ou ajoute une photo."; return; }
+  $("pubBtn").disabled = true; $("pubBtn").textContent = "Envoi…";
+  try {
+    var imgUrl = null;
+    if (picked) {
+      var path = me.id + "/" + Date.now() + ".jpg";
+      var up = await sb.storage.from("photos").upload(path, picked, { contentType: "image/jpeg" });
+      if (up.error) throw up.error;
+      imgUrl = sb.storage.from("photos").getPublicUrl(path).data.publicUrl;
+    }
+    var ins = await sb.from("posts").insert({ body: body || null, image_url: imgUrl });
+    if (ins.error) throw ins.error;
+    $("pBody").value = ""; clearPick();
+    await loadFeed();
+  } catch (e) { $("pErr").textContent = frErr(e.message); }
+  finally { $("pubBtn").disabled = false; $("pubBtn").textContent = "Publier"; }
+}
+
+/* ---------- Fil d'actualité ---------- */
+async function loadFeed() {
+  if (busy) return; busy = true;
+  var r = await sb.from("posts")
+    .select("id,body,image_url,created_at,user_id,profiles(name),likes(user_id),comments(id,body,created_at,user_id,profiles(name))")
+    .order("created_at", { ascending: false }).limit(50);
+  busy = false;
+  var feed = $("feed"); feed.textContent = "";
+  if (r.error) { feed.appendChild(h("div", { cls: "empty", text: frErr(r.error.message) })); return; }
+  if (!r.data.length) { feed.appendChild(h("div", { cls: "empty", text: "Aucune publication pour l'instant. Sois le premier !" })); return; }
+  r.data.forEach(function (p) { feed.appendChild(postCard(p)); });
+}
+
+function postCard(p) {
+  var nm = (p.profiles && p.profiles.name) || "Membre";
+  var liked = p.likes.some(function (l) { return l.user_id === me.id; });
+  var cms = p.comments.slice().sort(function (a, b) { return new Date(a.created_at) - new Date(b.created_at); });
+  var card = h("div", { cls: "card" });
+
+  var head = h("div", { cls: "row" }, [
+    h("div", { cls: "av", text: ini(nm) }),
+    h("div", { style: "flex:1;min-width:0" }, [h("div", { cls: "name", text: nm }), h("div", { cls: "time", text: ago(p.created_at) })])
+  ]);
+  if (p.user_id === me.id) head.appendChild(h("button", { cls: "del", text: "Supprimer", onclick: async function () {
+    if (!confirm("Supprimer cette publication ?")) return;
+    await sb.from("posts").delete().eq("id", p.id); loadFeed();
+  } }));
+  card.appendChild(head);
+  if (p.body) card.appendChild(h("div", { cls: "body", text: p.body }));
+  if (p.image_url) card.appendChild(h("img", { cls: "img", src: p.image_url, alt: "Photo", loading: "lazy" }));
+
+  var stats = h("div", { cls: "stats", text: p.likes.length + " j'aime · " + cms.length + " commentaire" + (cms.length > 1 ? "s" : "") });
+  card.appendChild(stats);
+
+  var likeBtn = h("button", { cls: liked ? "on" : "", text: (liked ? "♥ " : "♡ ") + "J'aime" });
+  likeBtn.onclick = async function () {
+    likeBtn.disabled = true;
+    if (liked) await sb.from("likes").delete().eq("post_id", p.id).eq("user_id", me.id);
+    else await sb.from("likes").insert({ post_id: p.id });
+    loadFeed();
+  };
+  var cmBtn = h("button", { text: "💬 Commenter" });
+  card.appendChild(h("div", { cls: "acts" }, [likeBtn, cmBtn]));
+
+  var box = h("div", { cls: "cm" + (open[p.id] ? "" : " hide") });
+  cms.forEach(function (c) {
+    var cn = (c.profiles && c.profiles.name) || "Membre";
+    var bub = h("div", { cls: "bub" }, [h("b", { text: cn }), h("span", { text: c.body })]);
+    var line = h("div", { cls: "c" }, [h("div", { cls: "av", text: ini(cn) }), bub]);
+    if (c.user_id === me.id) bub.appendChild(h("button", { cls: "del", text: "Supprimer", onclick: async function () {
+      await sb.from("comments").delete().eq("id", c.id); loadFeed();
+    } }));
+    box.appendChild(line);
+  });
+  var inp = h("input", { type: "text", maxlength: "500", placeholder: "Écrire un commentaire…" });
+  var send = h("button", { text: "Envoyer" });
+  async function sendC() {
+    var t = inp.value.trim(); if (!t) return;
+    send.disabled = true;
+    var r = await sb.from("comments").insert({ post_id: p.id, body: t });
+    if (r.error) { send.disabled = false; alert(frErr(r.error.message)); return; }
+    open[p.id] = true; loadFeed();
+  }
+  send.onclick = sendC;
+  inp.onkeydown = function (e) { if (e.key === "Enter") sendC(); };
+  box.appendChild(h("div", { cls: "cin" }, [inp, send]));
+  card.appendChild(box);
+  cmBtn.onclick = function () { open[p.id] = box.classList.contains("hide"); box.classList.toggle("hide"); if (open[p.id]) inp.focus(); };
+  return card;
+}
+
+/* ---------- Démarrage ---------- */
+async function start() {
+  if (!SUPA_URL || !SUPA_KEY || !window.supabase) { show("setup"); return; }
+  sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+  $("authSwitch").onclick = function () { setMode(mode === "login" ? "signup" : "login"); };
+  $("authGo").onclick = doAuth;
+  $("fPass").onkeydown = function (e) { if (e.key === "Enter") doAuth(); };
+  $("pickBtn").onclick = function () { $("file").click(); };
+  $("file").onchange = async function () {
+    var f = $("file").files[0]; if (!f) return;
+    try {
+      picked = await shrink(f, 1080);
+      $("prevImg").src = URL.createObjectURL(picked);
+      $("prev").classList.remove("hide");
+    } catch (e) { $("pErr").textContent = frErr(e.message); clearPick(); }
+  };
+  $("prevX").onclick = clearPick;
+  $("pubBtn").onclick = publish;
+  $("refresh").onclick = loadFeed;
+  $("logout").onclick = async function () { await sb.auth.signOut(); me = null; show("auth"); setMode("login"); };
+  setInterval(function () {
+    var a = document.activeElement;
+    if (me && !document.hidden && !(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA"))) loadFeed();
+  }, 45000);
+  var s = await sb.auth.getSession();
+  if (s.data.session) await enter(s.data.session.user); else { show("auth"); setMode("login"); }
+}
+start();
+</script>
+</body>
+  </html>
