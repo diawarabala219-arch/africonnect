@@ -6,16 +6,21 @@
 <meta name="theme-color" content="#ffffff">
 <title>AfriConnect</title>
 <style>
-:root{--brand:#1d6ff2;--brand-d:#1558c4;--bg:#eef0f4;--card:#fff;--ink:#1b1f2a;--mut:#667085;--line:#e3e6ec;--soft:#e7f0fe;--red:#d6336c;--g:#0a7d3b}
+:root{--brand:#0866ff;--brand-d:#0652cc;--bg:#e4e6eb;--card:#fff;--ink:#1b1f2a;--mut:#667085;--line:#e3e6ec;--soft:#e7f0fe;--red:#d6336c;--g:#0a7d3b}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 button{font:inherit;cursor:pointer}
 .top{position:sticky;top:0;z-index:6;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;padding:8px 14px;padding-top:calc(8px + env(safe-area-inset-top))}
-.top h1{margin:0;font-size:24px;flex:1;color:var(--brand);font-weight:800;letter-spacing:-.5px}
-.top .ib{width:38px;height:38px;border-radius:50%;border:0;background:var(--bg);color:var(--ink);display:grid;place-items:center}
-.top .ib svg{width:20px;height:20px}
-.wrap{max-width:620px;margin:0 auto;padding:10px 10px 90px}
-.card{background:var(--card);border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 1px 2px rgba(20,30,60,.07)}
+.top h1{margin:0;font-size:30px;flex:1;color:var(--brand);font-weight:800;letter-spacing:-1.5px}
+.top .ib{width:42px;height:42px;border-radius:50%;border:0;background:var(--bg);color:var(--ink);display:grid;place-items:center}
+.top .ib svg{width:22px;height:22px}
+.top{position:relative;z-index:8}
+.menu{position:absolute;right:10px;top:calc(56px + env(safe-area-inset-top));background:#fff;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.2);min-width:210px;padding:6px;z-index:20}
+.menu button{display:block;width:100%;text-align:left;background:none;border:0;padding:12px 14px;border-radius:8px;font-weight:600;font-size:16px}
+.menu button:active{background:var(--bg)}
+.wrap{max-width:620px;margin:0 auto;padding:0 0 60px}
+.card{background:var(--card);border-radius:0;padding:12px;margin-bottom:8px}
+.auth .card{border-radius:14px}
 .auth{max-width:420px;margin:7vh auto 0;padding:0 16px}
 .auth .logo{font-size:36px;font-weight:800;color:var(--brand);text-align:center;letter-spacing:-1px}
 .auth p.sub{text-align:center;color:var(--mut);margin:2px 0 14px}
@@ -33,7 +38,7 @@ a.who{color:inherit;text-decoration:none}
 .name{font-weight:700}
 .time{font-size:13px;color:var(--mut)}
 .body{white-space:pre-wrap;word-wrap:break-word;margin:10px 0 0}
-.img{width:100%;border-radius:10px;margin-top:10px;display:block;max-height:560px;object-fit:cover;background:var(--soft)}
+.img{width:calc(100% + 24px);margin:10px -12px 0;display:block;max-height:640px;object-fit:cover;background:var(--soft)}
 .stats{display:flex;justify-content:space-between;font-size:13px;color:var(--mut);margin-top:10px}
 .acts{display:flex;border-top:1px solid var(--line);margin-top:8px;padding-top:4px;gap:4px}
 .acts button{flex:1;background:none;border:0;padding:9px 2px;border-radius:10px;color:var(--mut);font-weight:700;font-size:14px;white-space:nowrap}
@@ -56,12 +61,12 @@ a.who{color:inherit;text-decoration:none}
 .prev button{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:50%;width:30px;height:30px}
 .empty{text-align:center;color:var(--mut);padding:30px 10px}
 .hide{display:none!important}
-.nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
-.nav a{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 7px;color:var(--mut);text-decoration:none;font-size:11px;font-weight:600}
-.nav a svg{width:24px;height:24px}
-.nav a.on{color:var(--brand)}
-.bd{position:absolute;top:3px;left:calc(50% + 4px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center}
-.cover{height:130px;border-radius:14px 14px 0 0;background:linear-gradient(135deg,#1d6ff2,#0a7d3b 60%,#f2b01d);margin:-12px -12px 0}
+.nav{position:sticky;top:calc(56px + env(safe-area-inset-top));z-index:7;background:#fff;border-bottom:1px solid var(--line);display:flex}
+.nav a{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:11px 0 9px;color:#4b4f56;text-decoration:none;font-size:0;border-bottom:3px solid transparent}
+.nav a svg{width:27px;height:27px}
+.nav a.on{color:var(--brand);border-bottom-color:var(--brand)}
+.bd{position:absolute;top:2px;left:calc(50% + 4px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center}
+.cover{height:130px;border-radius:0;background:linear-gradient(135deg,#1d6ff2,#0a7d3b 60%,#f2b01d);margin:-12px -12px 0}
 .pf{display:flex;flex-direction:column;align-items:center;margin-top:-52px;text-align:center}
 .pf .av{border:4px solid #fff}
 .pf h2{margin:8px 0 2px;font-size:22px}
@@ -98,6 +103,29 @@ h3.sec{margin:6px 4px 8px;font-size:17px}
 .nt:last-child{border-bottom:0}
 .nt.un{background:var(--soft);border-radius:10px}
 .nt .t{flex:1;min-width:0;font-size:15px}
+
+.cmp{display:flex;gap:10px;align-items:center}
+.pill{flex:1;text-align:left;background:var(--bg);border:0;border-radius:24px;padding:12px 16px;font-size:17px;color:#4b4f56}
+.phb{background:none;border:0;display:grid;place-items:center;color:#2eb85c;font-size:11px;font-weight:600;gap:0;padding:0 4px}
+.phb svg{width:34px;height:34px}
+.exp{margin-top:8px}
+.stories{display:flex;gap:8px;overflow-x:auto;padding:10px 12px;background:#fff;margin-bottom:8px;scrollbar-width:none}
+.stories::-webkit-scrollbar{display:none}
+.st{flex:none;width:112px;height:190px;border-radius:14px;position:relative;overflow:hidden;background:var(--soft) center/cover;border:1px solid var(--line);cursor:pointer}
+.st .nm{position:absolute;left:8px;right:8px;bottom:8px;color:#fff;font-weight:700;font-size:15px;text-shadow:0 1px 4px rgba(0,0,0,.7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st .ring{position:absolute;top:8px;left:8px;border:4px solid var(--brand);border-radius:50%}
+.st.mk{background:#fff}
+.st.mk .top2{height:130px;background:center/cover var(--soft)}
+.st.mk .plus{position:absolute;top:112px;left:50%;margin-left:-20px;width:40px;height:40px;border-radius:50%;background:var(--brand);color:#fff;border:4px solid #fff;display:grid;place-items:center;font-size:26px;line-height:1}
+.st.mk .nm{color:var(--ink);text-shadow:none;text-align:center;bottom:8px;white-space:normal;font-size:14px;line-height:1.15}
+.sv{position:fixed;inset:0;z-index:50;background:#000;display:flex;flex-direction:column}
+.sv img{flex:1;min-height:0;width:100%;object-fit:contain}
+.sv .hd{position:absolute;top:0;left:0;right:0;padding:calc(12px + env(safe-area-inset-top)) 14px 24px;display:flex;gap:10px;align-items:center;color:#fff;background:linear-gradient(#000a,#0000)}
+.sv .hd button{background:none;border:0;color:#fff;font-size:28px;margin-left:auto}
+.sv .bar{display:flex;gap:4px;position:absolute;top:calc(4px + env(safe-area-inset-top));left:8px;right:8px}
+.sv .bar i{flex:1;height:3px;background:#fff5;border-radius:2px}
+.sv .bar i.on{background:#fff}
+.more{background:none;border:0;font-size:22px;color:var(--mut);padding:0 6px;letter-spacing:1px}
 </style>
 </head>
 <body>
@@ -116,18 +144,24 @@ h3.sec{margin:6px 4px 8px;font-size:17px}
 </div>
 
 <div id="app" class="hide">
-  <div class="top"><h1>AfriConnect</h1>
-    <button class="ib" id="refresh" type="button" aria-label="Actualiser"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></button>
-    <button class="ib" id="logout" type="button" aria-label="Sortir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></button>
+  <div class="top"><h1>africonnect</h1>
+    <button class="ib" id="bPlus" type="button" aria-label="Publier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 4v16M4 12h16"/></svg></button>
+    <button class="ib" id="bSearch" type="button" aria-label="Chercher"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
+    <button class="ib" id="bMenu" type="button" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
   </div>
-  <div class="wrap" id="main"></div>
+  <div class="menu hide" id="menu">
+    <button type="button" id="mProf">👤 Mon profil</button>
+    <button type="button" id="mRef">🔄 Actualiser</button>
+    <button type="button" id="mOut">🚪 Se déconnecter</button>
+  </div>
   <nav class="nav">
-    <a href="#/" data-r="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>Accueil</a>
-    <a href="#/membres" data-r="members"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17.5 14c2.5 0 4 1.7 4 4.5"/></svg>Membres</a>
-    <a href="#/messages" data-r="msgs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-5.4A8 8 0 1 1 21 12z"/></svg>Messages<span class="bd hide" id="bd-msgs"></span></a>
-    <a href="#/alertes" data-r="alerts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>Alertes<span class="bd hide" id="bd-alerts"></span></a>
-    <a href="#/profil" data-r="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>Profil</a>
+    <a href="#/" data-r="home" aria-label="Accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg></a>
+    <a href="#/membres" data-r="members" aria-label="Membres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17.5 14c2.5 0 4 1.7 4 4.5"/></svg></a>
+    <a href="#/messages" data-r="msgs" aria-label="Messages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-5.4A8 8 0 1 1 21 12z"/></svg><span class="bd hide" id="bd-msgs"></span></a>
+    <a href="#/alertes" data-r="alerts" aria-label="Alertes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="bd hide" id="bd-alerts"></span></a>
+    <a href="#/profil" data-r="profile" aria-label="Profil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg></a>
   </nav>
+  <div class="wrap" id="main"></div>
 </div>
 
 <div id="setup" class="auth hide"><div class="card"><div class="logo">AfriConnect</div><p class="sub">La base n'est pas encore reliée.</p></div></div>
@@ -313,6 +347,7 @@ function route() {
 /* ---------- Accueil ---------- */
 function viewFeed(main) {
   main.appendChild(composer(function () { loadPosts(feed, null); }));
+  var sr = h("div", { cls: "stories" }); main.appendChild(sr); loadStories(sr);
   var feed = h("div", {}); main.appendChild(feed);
   loadPosts(feed, null);
   timer = setInterval(function () {
@@ -323,7 +358,7 @@ function viewFeed(main) {
 function composer(done) {
   var picked = null;
   var card = h("div", { cls: "card" });
-  var ta = h("textarea", { maxlength: "2000", placeholder: "Quoi de neuf, " + prof.name.split(" ")[0] + " ?" });
+  var ta = h("textarea", { maxlength: "2000", placeholder: "À quoi pensez-vous, " + prof.name.split(" ")[0] + " ?" });
   var err = h("p", { cls: "err" });
   var prevImg = h("img", { alt: "" });
   var prevX = h("button", { type: "button", text: "×", "aria-label": "Retirer la photo" });
@@ -331,11 +366,16 @@ function composer(done) {
   var file = h("input", { type: "file", accept: "image/*", cls: "hide" });
   var pick = h("button", { cls: "ph", type: "button", text: "📷 Photo" });
   var go = h("button", { cls: "go", type: "button", text: "Publier" });
-  card.appendChild(h("div", { cls: "row" }, [avEl(prof, 40), h("div", { style: "flex:1;min-width:0" }, [ta])]));
-  card.appendChild(prev);
-  card.appendChild(h("div", { cls: "tools" }, [pick, file, go]));
-  card.appendChild(err);
+  var pill = h("button", { cls: "pill", id: "pill", type: "button", text: "À quoi pensez-vous ?" });
+  var phb = h("button", { cls: "phb", type: "button", "aria-label": "Photo" });
+  phb.innerHTML = '<svg viewBox="0 0 24 24" fill="#2eb85c"><rect x="2" y="3" width="20" height="18" rx="3"/><circle cx="8.5" cy="9" r="2" fill="#fff"/><path d="M3 19l6-6 4 4 3-3 5 5z" fill="#fff"/></svg>Photo';
+  var top = h("div", { cls: "cmp" }, [avEl(prof, 44), pill, phb]);
+  var exp = h("div", { cls: "exp hide" }, [ta, prev, h("div", { cls: "tools" }, [pick, go])]);
+  card.appendChild(top); card.appendChild(exp); card.appendChild(file); card.appendChild(err);
+  function expand() { exp.classList.remove("hide"); pill.classList.add("hide"); phb.classList.add("hide"); ta.focus(); }
   function clear() { picked = null; file.value = ""; prev.classList.add("hide"); }
+  pill.onclick = expand;
+  phb.onclick = function () { expand(); file.click(); };
   pick.onclick = function () { file.click(); };
   prevX.onclick = clear;
   file.onchange = async function () {
@@ -351,11 +391,65 @@ function composer(done) {
       var imgUrl = picked ? await upload(picked, "") : null;
       var ins = await sb.from("posts").insert({ body: body || null, image_url: imgUrl });
       if (ins.error) throw ins.error;
-      ta.value = ""; clear(); done();
+      ta.value = ""; clear(); exp.classList.add("hide"); pill.classList.remove("hide"); phb.classList.remove("hide"); done();
     } catch (e) { err.textContent = frErr(e.message); }
     finally { go.disabled = false; go.textContent = "Publier"; }
   };
   return card;
+}
+/* ---------- Stories ---------- */
+async function loadStories(box) {
+  var since = new Date(Date.now() - 86400000).toISOString();
+  var mk = h("div", { cls: "st mk" }, [
+    h("div", { cls: "top2", style: prof.avatar_url ? "background-image:url('" + prof.avatar_url + "')" : "display:grid;place-items:center;font-size:40px;font-weight:800;color:var(--brand)", text: prof.avatar_url ? "" : ini(prof.name) }),
+    h("div", { cls: "plus", text: "+" }),
+    h("div", { cls: "nm", text: "Créer une story" })
+  ]);
+  var f = h("input", { type: "file", accept: "image/*", cls: "hide" });
+  mk.onclick = function () { f.click(); };
+  f.onchange = async function () {
+    var x = f.files[0]; if (!x) return;
+    try {
+      mk.querySelector(".nm").textContent = "Envoi…";
+      var u = await upload(await shrink(x, 1080, 0.8), "story-");
+      var r = await sb.from("stories").insert({ image_url: u });
+      if (r.error) throw r.error;
+      route();
+    } catch (e) { alert(/stories/.test(String(e.message)) ? "Lance d'abord le script SQL de la version 4." : frErr(e.message)); mk.querySelector(".nm").textContent = "Créer une story"; }
+  };
+  box.appendChild(mk); box.appendChild(f);
+  var r = await sb.from("stories").select("id,image_url,created_at,user_id,profiles!stories_user_id_fkey(name,avatar_url)").gte("created_at", since).order("created_at", { ascending: false }).limit(60);
+  if (r.error || !box.isConnected) return;
+  var by = {}, order = [];
+  r.data.forEach(function (x) { if (!by[x.user_id]) { by[x.user_id] = []; order.push(x.user_id); } by[x.user_id].unshift(x); });
+  order.forEach(function (uid) {
+    var list = by[uid], pr = list[0].profiles || { name: "Membre" };
+    var c = h("div", { cls: "st", style: "background-image:url('" + list[list.length - 1].image_url + "')" }, [
+      h("div", { cls: "ring" }, [avEl(pr, 34)]),
+      h("div", { cls: "nm", text: uid === me.id ? "Ta story" : pr.name })
+    ]);
+    c.onclick = function () { viewStory(list, 0, pr); };
+    box.appendChild(c);
+  });
+}
+function viewStory(list, i, pr) {
+  var s0 = list[i];
+  var ov = h("div", { cls: "sv" });
+  var bar = h("div", { cls: "bar" });
+  list.forEach(function (_, k) { bar.appendChild(h("i", { cls: k <= i ? "on" : "" })); });
+  var x = h("button", { type: "button", text: "×", "aria-label": "Fermer" });
+  var hd = h("div", { cls: "hd" }, [avEl(pr, 38), h("div", {}, [h("div", { cls: "name", text: pr.name }), h("div", { cls: "time", text: ago(s0.created_at), style: "color:#ddd" })])]);
+  if (s0.user_id === me.id) hd.appendChild(h("button", { type: "button", text: "🗑", style: "font-size:20px", onclick: async function (e) {
+    e.stopPropagation();
+    if (!confirm("Supprimer cette story ?")) return;
+    await sb.from("stories").delete().eq("id", s0.id); ov.remove(); route();
+  } }));
+  hd.appendChild(x);
+  ov.appendChild(h("img", { src: s0.image_url, alt: "Story" }));
+  ov.appendChild(bar); ov.appendChild(hd);
+  x.onclick = function (e) { e.stopPropagation(); ov.remove(); };
+  ov.onclick = function () { ov.remove(); if (i + 1 < list.length) viewStory(list, i + 1, pr); };
+  document.body.appendChild(ov);
 }
 async function loadPosts(container, userId) {
   if (busy) return; busy = true;
@@ -377,9 +471,9 @@ function postCard(p, reload) {
   var who = h("a", { cls: "who", href: "#/profil/" + p.user_id }, [h("div", { cls: "name", text: pr.name })]);
   var head = h("div", { cls: "row" }, [
     h("a", { cls: "who", href: "#/profil/" + p.user_id }, [avEl(pr, 42)]),
-    h("div", { style: "flex:1;min-width:0" }, [who, h("div", { cls: "time", text: ago(p.created_at) })])
+    h("div", { style: "flex:1;min-width:0" }, [who, h("div", { cls: "time", text: ago(p.created_at) + " · 🌍" })])
   ]);
-  if (p.user_id === me.id) head.appendChild(h("button", { cls: "del", text: "Supprimer", onclick: async function () {
+  if (p.user_id === me.id) head.appendChild(h("button", { cls: "more", text: "•••", "aria-label": "Options", onclick: async function () {
     if (!confirm("Supprimer cette publication ?")) return;
     await sb.from("posts").delete().eq("id", p.id); reload();
   } }));
@@ -650,8 +744,20 @@ async function start() {
   $("authSwitch").onclick = function () { setMode(mode === "login" ? "signup" : "login"); };
   $("authGo").onclick = doAuth;
   $("fPass").onkeydown = function (e) { if (e.key === "Enter") doAuth(); };
-  $("refresh").onclick = function () { route(); refreshBadges(); };
-  $("logout").onclick = async function () { await sb.auth.signOut(); me = null; clearInterval(timer); clearInterval(badgeTimer); show("auth"); setMode("login"); };
+  var menu = $("menu");
+  $("bMenu").onclick = function (e) { e.stopPropagation(); menu.classList.toggle("hide"); };
+  document.addEventListener("click", function () { menu.classList.add("hide"); });
+  $("mProf").onclick = function () { location.hash = "#/profil"; };
+  $("mRef").onclick = function () { route(); refreshBadges(); };
+  $("mOut").onclick = async function () { await sb.auth.signOut(); me = null; clearInterval(timer); clearInterval(badgeTimer); show("auth"); setMode("login"); };
+  $("bPlus").onclick = function () {
+    if (location.hash && location.hash !== "#/") location.hash = "#/";
+    setTimeout(function () { var p = document.getElementById("pill"); window.scrollTo(0, 0); if (p) p.click(); }, 60);
+  };
+  $("bSearch").onclick = function () {
+    location.hash = "#/membres";
+    setTimeout(function () { var q = document.querySelector("#main input[type=text]"); if (q) q.focus(); }, 300);
+  };
   window.addEventListener("hashchange", route);
   var s = await sb.auth.getSession();
   if (s.data.session) await enter(s.data.session.user); else { show("auth"); setMode("login"); }
