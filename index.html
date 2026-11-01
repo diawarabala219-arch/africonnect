@@ -217,7 +217,7 @@ async function publish() {
 async function loadFeed() {
   if (busy) return; busy = true;
   var r = await sb.from("posts")
-    .select("id,body,image_url,created_at,user_id,profiles(name),likes(user_id),comments(id,body,created_at,user_id,profiles(name))")
+    .select("id,body,image_url,created_at,user_id,profiles!posts_user_id_fkey(name),likes(user_id),comments(id,body,created_at,user_id,profiles!comments_user_id_fkey(name))")
     .order("created_at", { ascending: false }).limit(50);
   busy = false;
   var feed = $("feed"); feed.textContent = "";
