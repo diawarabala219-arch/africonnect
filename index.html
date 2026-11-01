@@ -3,58 +3,75 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#534AB7">
+<meta name="theme-color" content="#ffffff">
 <title>AfriConnect</title>
 <style>
-:root{--brand:#534AB7;--brand-d:#3b3390;--bg:#f1f0f8;--card:#fff;--ink:#1c1a33;--mut:#6b6987;--line:#e4e2f2;--soft:#eeecf9;--red:#d6336c}
+:root{--brand:#1d6ff2;--brand-d:#1558c4;--bg:#eef0f4;--card:#fff;--ink:#1b1f2a;--mut:#667085;--line:#e3e6ec;--soft:#e7f0fe;--red:#d6336c;--g:#0a7d3b}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 button{font:inherit;cursor:pointer}
-.top{position:sticky;top:0;z-index:5;background:var(--brand);color:#fff;display:flex;align-items:center;gap:8px;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top))}
-.top h1{margin:0;font-size:20px;flex:1;letter-spacing:.2px}
-.top button{background:rgba(255,255,255,.18);color:#fff;border:0;border-radius:10px;padding:8px 12px;font-size:14px;font-weight:600}
-.wrap{max-width:620px;margin:0 auto;padding:12px 12px 80px}
-.card{background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 1px 2px rgba(40,30,100,.08)}
-.auth{max-width:420px;margin:8vh auto 0;padding:0 16px}
-.auth .logo{font-size:30px;font-weight:800;color:var(--brand);text-align:center;margin-bottom:4px}
-.auth p.sub{text-align:center;color:var(--mut);margin:0 0 16px}
+.top{position:sticky;top:0;z-index:6;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;padding:8px 14px;padding-top:calc(8px + env(safe-area-inset-top))}
+.top h1{margin:0;font-size:24px;flex:1;color:var(--brand);font-weight:800;letter-spacing:-.5px}
+.top .ib{width:38px;height:38px;border-radius:50%;border:0;background:var(--bg);color:var(--ink);display:grid;place-items:center}
+.top .ib svg{width:20px;height:20px}
+.wrap{max-width:620px;margin:0 auto;padding:10px 10px 90px}
+.card{background:var(--card);border-radius:14px;padding:12px;margin-bottom:10px;box-shadow:0 1px 2px rgba(20,30,60,.07)}
+.auth{max-width:420px;margin:7vh auto 0;padding:0 16px}
+.auth .logo{font-size:36px;font-weight:800;color:var(--brand);text-align:center;letter-spacing:-1px}
+.auth p.sub{text-align:center;color:var(--mut);margin:2px 0 14px}
 label{display:block;font-size:14px;font-weight:600;margin:10px 0 4px}
 input[type=text],input[type=email],input[type=password],textarea{width:100%;font:inherit;font-size:16px;padding:11px 12px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
 input:focus,textarea:focus{outline:none;border-color:var(--brand)}
-textarea{resize:none;min-height:70px}
+textarea{resize:none;min-height:64px}
 .btn{width:100%;background:var(--brand);color:#fff;border:0;border-radius:12px;padding:12px;font-weight:700;margin-top:14px}
 .btn:disabled{opacity:.55}
 .link{background:none;border:0;color:var(--brand);font-weight:700;padding:8px;width:100%;margin-top:6px}
-.err{color:var(--red);font-weight:600;font-size:14px;margin:10px 0 0;min-height:1em}
-.row{display:flex;gap:8px;align-items:center}
-.av{width:40px;height:40px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:800;flex:none}
+.err{color:var(--red);font-weight:600;font-size:14px;margin:8px 0 0;min-height:1em}
+.row{display:flex;gap:10px;align-items:center}
+.av{border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:800;flex:none;object-fit:cover;overflow:hidden}
+a.who{color:inherit;text-decoration:none}
 .name{font-weight:700}
 .time{font-size:13px;color:var(--mut)}
 .body{white-space:pre-wrap;word-wrap:break-word;margin:10px 0 0}
-.img{width:100%;border-radius:12px;margin-top:10px;display:block;max-height:520px;object-fit:cover;background:var(--soft)}
-.stats{font-size:13px;color:var(--mut);margin-top:10px}
-.acts{display:flex;border-top:1px solid var(--line);margin-top:10px;padding-top:6px;gap:6px}
-.acts button{flex:1;background:none;border:0;padding:9px;border-radius:10px;color:var(--mut);font-weight:700}
+.img{width:100%;border-radius:10px;margin-top:10px;display:block;max-height:560px;object-fit:cover;background:var(--soft)}
+.stats{display:flex;justify-content:space-between;font-size:13px;color:var(--mut);margin-top:10px}
+.acts{display:flex;border-top:1px solid var(--line);margin-top:8px;padding-top:4px;gap:4px}
+.acts button{flex:1;background:none;border:0;padding:9px 2px;border-radius:10px;color:var(--mut);font-weight:700;font-size:14px;white-space:nowrap}
 .acts button.on{color:var(--brand)}
-.acts button:active{background:var(--soft)}
-.cm{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+.acts button:active{background:var(--bg)}
+.cm{margin-top:6px;padding-top:8px;border-top:1px solid var(--line)}
 .c{display:flex;gap:8px;margin-bottom:8px}
-.c .av{width:30px;height:30px;font-size:13px}
-.bub{background:var(--soft);border-radius:14px;padding:7px 11px;font-size:15px;word-wrap:break-word;min-width:0}
+.bub{background:var(--bg);border-radius:16px;padding:7px 12px;font-size:15px;word-wrap:break-word;min-width:0}
 .bub b{display:block;font-size:13px}
 .del{background:none;border:0;color:var(--mut);font-size:12px;padding:0 0 0 8px}
 .cin{display:flex;gap:6px}
-.cin input{flex:1}
-.cin button{background:var(--brand);color:#fff;border:0;border-radius:12px;padding:0 14px;font-weight:700}
+.cin input{flex:1;border-radius:20px}
+.cin button{background:var(--brand);color:#fff;border:0;border-radius:20px;padding:0 14px;font-weight:700}
 .tools{display:flex;gap:8px;align-items:center;margin-top:8px}
 .tools .ph{background:var(--soft);color:var(--brand);border:0;border-radius:10px;padding:9px 12px;font-weight:700}
-.tools .go{margin-left:auto;background:var(--brand);color:#fff;border:0;border-radius:10px;padding:9px 18px;font-weight:700}
+.tools .go{margin-left:auto;background:var(--brand);color:#fff;border:0;border-radius:10px;padding:9px 20px;font-weight:700}
 .tools .go:disabled{opacity:.5}
 .prev{position:relative;margin-top:8px}
 .prev img{width:100%;border-radius:12px;max-height:260px;object-fit:cover;display:block}
 .prev button{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:50%;width:30px;height:30px}
 .empty{text-align:center;color:var(--mut);padding:30px 10px}
 .hide{display:none!important}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+.nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 7px;color:var(--mut);text-decoration:none;font-size:11px;font-weight:600}
+.nav a svg{width:24px;height:24px}
+.nav a.on{color:var(--brand)}
+.cover{height:130px;border-radius:14px 14px 0 0;background:linear-gradient(135deg,#1d6ff2,#0a7d3b 60%,#f2b01d);margin:-12px -12px 0}
+.pf{display:flex;flex-direction:column;align-items:center;margin-top:-52px;text-align:center}
+.pf .av{border:4px solid #fff}
+.pf h2{margin:8px 0 2px;font-size:22px}
+.pf p{margin:4px 0 0;color:var(--mut);max-width:420px;word-wrap:break-word}
+.pf .btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;justify-content:center}
+.pf .btns button{background:var(--soft);color:var(--brand);border:0;border-radius:10px;padding:9px 14px;font-weight:700}
+.mem{display:flex;gap:12px;align-items:center;padding:10px 4px;border-bottom:1px solid var(--line)}
+.mem:last-child{border-bottom:0}
+.mem .bio{font-size:13px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mem button{margin-left:auto;background:var(--soft);color:var(--brand);border:0;border-radius:10px;padding:8px 12px;font-weight:700}
+h3.sec{margin:6px 4px 8px;font-size:17px}
 </style>
 </head>
 <body>
@@ -73,24 +90,20 @@ textarea{resize:none;min-height:70px}
 </div>
 
 <div id="app" class="hide">
-  <div class="top"><h1>AfriConnect</h1><button id="refresh" type="button">Actualiser</button><button id="logout" type="button">Sortir</button></div>
-  <div class="wrap">
-    <div class="card">
-      <div class="row"><div class="av" id="meAv">?</div><div class="name" id="meName"></div></div>
-      <textarea id="pBody" maxlength="2000" placeholder="Quoi de neuf à Conakry ?"></textarea>
-      <div class="prev hide" id="prev"><img id="prevImg" alt=""><button id="prevX" type="button" aria-label="Retirer la photo">×</button></div>
-      <div class="tools">
-        <button class="ph" id="pickBtn" type="button">📷 Photo</button>
-        <input id="file" type="file" accept="image/*" class="hide">
-        <button class="go" id="pubBtn" type="button">Publier</button>
-      </div>
-      <p class="err" id="pErr"></p>
-    </div>
-    <div id="feed"></div>
+  <div class="top"><h1>AfriConnect</h1>
+    <button class="ib" id="refresh" type="button" aria-label="Actualiser"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></button>
+    <button class="ib" id="logout" type="button" aria-label="Sortir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></button>
   </div>
+  <div class="wrap" id="main"></div>
+  <nav class="nav">
+    <a href="#/" data-r="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>Accueil</a>
+    <a href="#/membres" data-r="members"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17.5 14c2.5 0 4 1.7 4 4.5"/></svg>Membres</a>
+    <a href="#/messages" data-r="msgs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-5.4A8 8 0 1 1 21 12z"/></svg>Messages</a>
+    <a href="#/profil" data-r="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>Profil</a>
+  </nav>
 </div>
 
-<div id="setup" class="auth hide"><div class="card"><div class="logo">AfriConnect</div><p class="sub">La base n'est pas encore reliée. Ajoute l'adresse et la clé Supabase dans le fichier reseau.html.</p></div></div>
+<div id="setup" class="auth hide"><div class="card"><div class="logo">AfriConnect</div><p class="sub">La base n'est pas encore reliée.</p></div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
@@ -98,8 +111,8 @@ var SUPA_URL = "https://edsvhqwetulvypocdjku.supabase.co";
 var SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkc3ZocXdldHVsdnlwb2Nkamt1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzNzQ0OTcsImV4cCI6MjEwODk1MDQ5N30.0opGuYQPIc0hZQlUNlCk9h8kPXD-G4IdaAge2ioiKTM";
 
 var $ = function (id) { return document.getElementById(id); };
-var sb = null, me = null, myName = "", picked = null, mode = "login", busy = false;
-var open = {};
+var rid = 0, sb = null, me = null, prof = { name: "", avatar_url: null, bio: "" }, mode = "login", busy = false, open = {}, timer = null;
+var POST_SEL = "id,body,image_url,created_at,user_id,profiles!posts_user_id_fkey(name,avatar_url),likes(user_id),comments(id,body,created_at,user_id,profiles!comments_user_id_fkey(name,avatar_url))";
 
 function h(tag, props, kids) {
   var e = document.createElement(tag);
@@ -121,6 +134,11 @@ function ago(iso) {
   return new Date(iso).toLocaleDateString("fr-FR");
 }
 function ini(n) { return (n || "?").trim().charAt(0).toUpperCase() || "?"; }
+function avEl(p, size) {
+  var st = "width:" + size + "px;height:" + size + "px;font-size:" + Math.round(size * 0.42) + "px";
+  if (p && p.avatar_url) return h("img", { cls: "av", src: p.avatar_url, alt: "", style: st });
+  return h("div", { cls: "av", text: ini(p && p.name), style: st });
+}
 function frErr(m) {
   m = String(m || "");
   if (/Invalid login/i.test(m)) return "E-mail ou mot de passe incorrect.";
@@ -132,7 +150,6 @@ function frErr(m) {
   if (/Failed to fetch|NetworkError|network/i.test(m)) return "Pas de connexion. Réessaie.";
   return m || "Une erreur est survenue.";
 }
-
 function show(which) {
   ["auth", "app", "setup"].forEach(function (k) { $(k).classList.toggle("hide", k !== which); });
 }
@@ -164,19 +181,17 @@ async function doAuth() {
   } catch (e) { $("authErr").textContent = frErr(e.message); }
   finally { $("authGo").disabled = false; }
 }
-
 async function enter(user) {
   me = user;
-  var r = await sb.from("profiles").select("name").eq("id", user.id).maybeSingle();
-  myName = (r.data && r.data.name) || (user.user_metadata && user.user_metadata.name) || "Membre";
-  $("meName").textContent = myName;
-  $("meAv").textContent = ini(myName);
+  var r = await sb.from("profiles").select("name,avatar_url,bio").eq("id", user.id).maybeSingle();
+  var d = r.data || {};
+  prof = { name: d.name || (user.user_metadata && user.user_metadata.name) || "Membre", avatar_url: d.avatar_url || null, bio: d.bio || "" };
   show("app");
-  loadFeed();
+  route();
 }
 
 /* ---------- Photos ---------- */
-function shrink(file, max) {
+function shrink(file, max, q) {
   return new Promise(function (ok, ko) {
     var url = URL.createObjectURL(file), im = new Image();
     im.onload = function () {
@@ -184,88 +199,137 @@ function shrink(file, max) {
       var c = document.createElement("canvas"); c.width = Math.round(w * k); c.height = Math.round(hh * k);
       c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
       URL.revokeObjectURL(url);
-      c.toBlob(function (b) { b ? ok(b) : ko(new Error("Photo illisible.")); }, "image/jpeg", 0.8);
+      c.toBlob(function (b) { b ? ok(b) : ko(new Error("Photo illisible.")); }, "image/jpeg", q);
     };
     im.onerror = function () { URL.revokeObjectURL(url); ko(new Error("Photo illisible.")); };
     im.src = url;
   });
 }
-function clearPick() { picked = null; $("file").value = ""; $("prev").classList.add("hide"); }
-
-async function publish() {
-  var body = $("pBody").value.trim();
-  $("pErr").textContent = "";
-  if (!body && !picked) { $("pErr").textContent = "Écris quelque chose ou ajoute une photo."; return; }
-  $("pubBtn").disabled = true; $("pubBtn").textContent = "Envoi…";
-  try {
-    var imgUrl = null;
-    if (picked) {
-      var path = me.id + "/" + Date.now() + ".jpg";
-      var up = await sb.storage.from("photos").upload(path, picked, { contentType: "image/jpeg" });
-      if (up.error) throw up.error;
-      imgUrl = sb.storage.from("photos").getPublicUrl(path).data.publicUrl;
-    }
-    var ins = await sb.from("posts").insert({ body: body || null, image_url: imgUrl });
-    if (ins.error) throw ins.error;
-    $("pBody").value = ""; clearPick();
-    await loadFeed();
-  } catch (e) { $("pErr").textContent = frErr(e.message); }
-  finally { $("pubBtn").disabled = false; $("pubBtn").textContent = "Publier"; }
+async function upload(blob, tag) {
+  var path = me.id + "/" + tag + Date.now() + ".jpg";
+  var up = await sb.storage.from("photos").upload(path, blob, { contentType: "image/jpeg" });
+  if (up.error) throw up.error;
+  return sb.storage.from("photos").getPublicUrl(path).data.publicUrl;
 }
 
-/* ---------- Fil d'actualité ---------- */
-async function loadFeed() {
+/* ---------- Navigation ---------- */
+function route() {
+  if (!me) return;
+  clearInterval(timer); rid++;
+  var hs = location.hash || "#/", parts = hs.replace(/^#\/?/, "").split("/");
+  var main = $("main"); main.textContent = "";
+  var r = "home";
+  if (parts[0] === "membres") { r = "members"; viewMembers(main); }
+  else if (parts[0] === "messages") { r = "msgs"; viewMsgs(main); }
+  else if (parts[0] === "profil") { r = "profile"; viewProfile(main, parts[1] || me.id); }
+  else { viewFeed(main); }
+  Array.prototype.forEach.call(document.querySelectorAll(".nav a"), function (a) {
+    a.classList.toggle("on", a.getAttribute("data-r") === r && !(r === "profile" && parts[1] && parts[1] !== me.id));
+  });
+  window.scrollTo(0, 0);
+}
+
+/* ---------- Accueil ---------- */
+function viewFeed(main) {
+  main.appendChild(composer(function () { loadPosts(feed, null); }));
+  var feed = h("div", {}); main.appendChild(feed);
+  loadPosts(feed, null);
+  timer = setInterval(function () {
+    var a = document.activeElement;
+    if (!document.hidden && !(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA"))) loadPosts(feed, null);
+  }, 45000);
+}
+function composer(done) {
+  var picked = null;
+  var card = h("div", { cls: "card" });
+  var ta = h("textarea", { maxlength: "2000", placeholder: "Quoi de neuf, " + prof.name.split(" ")[0] + " ?" });
+  var err = h("p", { cls: "err" });
+  var prevImg = h("img", { alt: "" });
+  var prevX = h("button", { type: "button", text: "×", "aria-label": "Retirer la photo" });
+  var prev = h("div", { cls: "prev hide" }, [prevImg, prevX]);
+  var file = h("input", { type: "file", accept: "image/*", cls: "hide" });
+  var pick = h("button", { cls: "ph", type: "button", text: "📷 Photo" });
+  var go = h("button", { cls: "go", type: "button", text: "Publier" });
+  card.appendChild(h("div", { cls: "row" }, [avEl(prof, 40), h("div", { style: "flex:1;min-width:0" }, [ta])]));
+  card.appendChild(prev);
+  card.appendChild(h("div", { cls: "tools" }, [pick, file, go]));
+  card.appendChild(err);
+  function clear() { picked = null; file.value = ""; prev.classList.add("hide"); }
+  pick.onclick = function () { file.click(); };
+  prevX.onclick = clear;
+  file.onchange = async function () {
+    var f = file.files[0]; if (!f) return;
+    try { picked = await shrink(f, 1080, 0.8); prevImg.src = URL.createObjectURL(picked); prev.classList.remove("hide"); }
+    catch (e) { err.textContent = frErr(e.message); clear(); }
+  };
+  go.onclick = async function () {
+    var body = ta.value.trim(); err.textContent = "";
+    if (!body && !picked) { err.textContent = "Écris quelque chose ou ajoute une photo."; return; }
+    go.disabled = true; go.textContent = "Envoi…";
+    try {
+      var imgUrl = picked ? await upload(picked, "") : null;
+      var ins = await sb.from("posts").insert({ body: body || null, image_url: imgUrl });
+      if (ins.error) throw ins.error;
+      ta.value = ""; clear(); done();
+    } catch (e) { err.textContent = frErr(e.message); }
+    finally { go.disabled = false; go.textContent = "Publier"; }
+  };
+  return card;
+}
+async function loadPosts(container, userId) {
   if (busy) return; busy = true;
-  var r = await sb.from("posts")
-    .select("id,body,image_url,created_at,user_id,profiles!posts_user_id_fkey(name),likes(user_id),comments(id,body,created_at,user_id,profiles!comments_user_id_fkey(name))")
-    .order("created_at", { ascending: false }).limit(50);
+  var q = sb.from("posts").select(POST_SEL);
+  if (userId) q = q.eq("user_id", userId);
+  var r = await q.order("created_at", { ascending: false }).limit(50);
   busy = false;
-  var feed = $("feed"); feed.textContent = "";
-  if (r.error) { feed.appendChild(h("div", { cls: "empty", text: frErr(r.error.message) })); return; }
-  if (!r.data.length) { feed.appendChild(h("div", { cls: "empty", text: "Aucune publication pour l'instant. Sois le premier !" })); return; }
-  r.data.forEach(function (p) { feed.appendChild(postCard(p)); });
+  if (!container.isConnected) return;
+  container.textContent = "";
+  if (r.error) { container.appendChild(h("div", { cls: "empty", text: frErr(r.error.message) })); return; }
+  if (!r.data.length) { container.appendChild(h("div", { cls: "empty", text: userId ? "Aucune publication pour l'instant." : "Aucune publication pour l'instant. Sois le premier !" })); return; }
+  r.data.forEach(function (p) { container.appendChild(postCard(p, function () { loadPosts(container, userId); })); });
 }
-
-function postCard(p) {
-  var nm = (p.profiles && p.profiles.name) || "Membre";
+function postCard(p, reload) {
+  var pr = p.profiles || { name: "Membre" };
   var liked = p.likes.some(function (l) { return l.user_id === me.id; });
   var cms = p.comments.slice().sort(function (a, b) { return new Date(a.created_at) - new Date(b.created_at); });
   var card = h("div", { cls: "card" });
-
+  var who = h("a", { cls: "who", href: "#/profil/" + p.user_id }, [h("div", { cls: "name", text: pr.name })]);
   var head = h("div", { cls: "row" }, [
-    h("div", { cls: "av", text: ini(nm) }),
-    h("div", { style: "flex:1;min-width:0" }, [h("div", { cls: "name", text: nm }), h("div", { cls: "time", text: ago(p.created_at) })])
+    h("a", { cls: "who", href: "#/profil/" + p.user_id }, [avEl(pr, 42)]),
+    h("div", { style: "flex:1;min-width:0" }, [who, h("div", { cls: "time", text: ago(p.created_at) })])
   ]);
   if (p.user_id === me.id) head.appendChild(h("button", { cls: "del", text: "Supprimer", onclick: async function () {
     if (!confirm("Supprimer cette publication ?")) return;
-    await sb.from("posts").delete().eq("id", p.id); loadFeed();
+    await sb.from("posts").delete().eq("id", p.id); reload();
   } }));
   card.appendChild(head);
   if (p.body) card.appendChild(h("div", { cls: "body", text: p.body }));
   if (p.image_url) card.appendChild(h("img", { cls: "img", src: p.image_url, alt: "Photo", loading: "lazy" }));
-
-  var stats = h("div", { cls: "stats", text: p.likes.length + " j'aime · " + cms.length + " commentaire" + (cms.length > 1 ? "s" : "") });
-  card.appendChild(stats);
-
-  var likeBtn = h("button", { cls: liked ? "on" : "", text: (liked ? "♥ " : "♡ ") + "J'aime" });
+  card.appendChild(h("div", { cls: "stats" }, [
+    h("span", { text: p.likes.length ? "👍 " + p.likes.length : "" }),
+    h("span", { text: cms.length ? cms.length + " commentaire" + (cms.length > 1 ? "s" : "") : "" })
+  ]));
+  var likeBtn = h("button", { cls: liked ? "on" : "", text: (liked ? "👍 " : "👍 ") + "J'aime" });
   likeBtn.onclick = async function () {
     likeBtn.disabled = true;
     if (liked) await sb.from("likes").delete().eq("post_id", p.id).eq("user_id", me.id);
     else await sb.from("likes").insert({ post_id: p.id });
-    loadFeed();
+    reload();
   };
   var cmBtn = h("button", { text: "💬 Commenter" });
-  card.appendChild(h("div", { cls: "acts" }, [likeBtn, cmBtn]));
-
+  var shBtn = h("button", { text: "↗ Partager", onclick: async function () {
+    var txt = (pr.name + " sur AfriConnect : " + (p.body || "")).slice(0, 200), link = location.origin + location.pathname;
+    try { if (navigator.share) await navigator.share({ title: "AfriConnect", text: txt, url: link }); else { await navigator.clipboard.writeText(txt + " " + link); shBtn.textContent = "✓ Copié"; } } catch (e) {}
+  } });
+  card.appendChild(h("div", { cls: "acts" }, [likeBtn, cmBtn, shBtn]));
   var box = h("div", { cls: "cm" + (open[p.id] ? "" : " hide") });
   cms.forEach(function (c) {
-    var cn = (c.profiles && c.profiles.name) || "Membre";
-    var bub = h("div", { cls: "bub" }, [h("b", { text: cn }), h("span", { text: c.body })]);
-    var line = h("div", { cls: "c" }, [h("div", { cls: "av", text: ini(cn) }), bub]);
+    var cp = c.profiles || { name: "Membre" };
+    var bub = h("div", { cls: "bub" }, [h("b", { text: cp.name }), h("span", { text: c.body })]);
     if (c.user_id === me.id) bub.appendChild(h("button", { cls: "del", text: "Supprimer", onclick: async function () {
-      await sb.from("comments").delete().eq("id", c.id); loadFeed();
+      await sb.from("comments").delete().eq("id", c.id); reload();
     } }));
-    box.appendChild(line);
+    box.appendChild(h("div", { cls: "c" }, [avEl(cp, 32), bub]));
   });
   var inp = h("input", { type: "text", maxlength: "500", placeholder: "Écrire un commentaire…" });
   var send = h("button", { text: "Envoyer" });
@@ -274,7 +338,7 @@ function postCard(p) {
     send.disabled = true;
     var r = await sb.from("comments").insert({ post_id: p.id, body: t });
     if (r.error) { send.disabled = false; alert(frErr(r.error.message)); return; }
-    open[p.id] = true; loadFeed();
+    open[p.id] = true; reload();
   }
   send.onclick = sendC;
   inp.onkeydown = function (e) { if (e.key === "Enter") sendC(); };
@@ -284,6 +348,92 @@ function postCard(p) {
   return card;
 }
 
+/* ---------- Profil ---------- */
+async function viewProfile(main, id) {
+  var my = rid;
+  var own = id === me.id;
+  var d = own ? prof : null;
+  if (!own) {
+    var r = await sb.from("profiles").select("name,avatar_url,bio").eq("id", id).maybeSingle();
+    d = r.data;
+    if (my !== rid) return;
+    if (!d) { main.appendChild(h("div", { cls: "empty", text: "Profil introuvable." })); return; }
+  }
+  var card = h("div", { cls: "card" });
+  card.appendChild(h("div", { cls: "cover" }));
+  var pf = h("div", { cls: "pf" });
+  var avBox = h("div", {}, [avEl(d, 104)]);
+  pf.appendChild(avBox);
+  pf.appendChild(h("h2", { text: d.name }));
+  pf.appendChild(h("p", { text: d.bio || (own ? "Ajoute une courte présentation de toi." : "") }));
+  if (own) {
+    var file = h("input", { type: "file", accept: "image/*", cls: "hide" });
+    var msg = h("p", { cls: "err" });
+    var bPhoto = h("button", { type: "button", text: "📷 Changer la photo" });
+    var bBio = h("button", { type: "button", text: "✏️ Modifier la présentation" });
+    bPhoto.onclick = function () { file.click(); };
+    file.onchange = async function () {
+      var f = file.files[0]; if (!f) return;
+      bPhoto.disabled = true; bPhoto.textContent = "Envoi…"; msg.textContent = "";
+      try {
+        var url = await upload(await shrink(f, 480, 0.85), "avatar-");
+        var u = await sb.from("profiles").update({ avatar_url: url }).eq("id", me.id);
+        if (u.error) throw u.error;
+        prof.avatar_url = url; route();
+      } catch (e) { msg.textContent = frErr(e.message); bPhoto.disabled = false; bPhoto.textContent = "📷 Changer la photo"; }
+    };
+    bBio.onclick = async function () {
+      var t = prompt("Ta présentation (150 caractères max) :", prof.bio || "");
+      if (t === null) return;
+      t = t.trim().slice(0, 150);
+      var u = await sb.from("profiles").update({ bio: t }).eq("id", me.id);
+      if (u.error) { msg.textContent = frErr(u.error.message); return; }
+      prof.bio = t; route();
+    };
+    pf.appendChild(h("div", { cls: "btns" }, [bPhoto, bBio, file]));
+    pf.appendChild(msg);
+  }
+  card.appendChild(pf);
+  main.appendChild(card);
+  main.appendChild(h("h3", { cls: "sec", text: own ? "Mes publications" : "Publications de " + d.name.split(" ")[0] }));
+  var feed = h("div", {}); main.appendChild(feed);
+  loadPosts(feed, id);
+}
+
+/* ---------- Membres ---------- */
+async function viewMembers(main) {
+  var my = rid;
+  var card = h("div", { cls: "card" });
+  var q = h("input", { type: "text", placeholder: "Chercher un membre…" });
+  var list = h("div", { style: "margin-top:8px" });
+  card.appendChild(q); card.appendChild(list);
+  main.appendChild(h("h3", { cls: "sec", text: "Membres d'AfriConnect" }));
+  main.appendChild(card);
+  var r = await sb.from("profiles").select("id,name,avatar_url,bio").order("created_at", { ascending: false }).limit(200);
+  if (my !== rid) return;
+  if (r.error) { list.appendChild(h("div", { cls: "empty", text: frErr(r.error.message) })); return; }
+  function draw() {
+    var t = q.value.trim().toLowerCase(); list.textContent = "";
+    var rows = r.data.filter(function (m) { return !t || (m.name || "").toLowerCase().indexOf(t) >= 0; });
+    if (!rows.length) { list.appendChild(h("div", { cls: "empty", text: "Aucun membre trouvé." })); return; }
+    rows.forEach(function (m) {
+      list.appendChild(h("div", { cls: "mem" }, [
+        avEl(m, 46),
+        h("div", { style: "min-width:0" }, [h("div", { cls: "name", text: m.name + (m.id === me.id ? " (toi)" : "") }), h("div", { cls: "bio", text: m.bio || "" })]),
+        h("button", { text: "Voir", onclick: function () { location.hash = "#/profil/" + m.id; } })
+      ]));
+    });
+  }
+  q.oninput = draw; draw();
+}
+
+/* ---------- Messages ---------- */
+function viewMsgs(main) {
+  main.appendChild(h("div", { cls: "card" }, [
+    h("div", { cls: "empty" }, [h("div", { text: "✉️", style: "font-size:40px" }), h("div", { cls: "name", text: "Messages privés" }), h("div", { text: "Cette fonction arrive bientôt." })])
+  ]));
+}
+
 /* ---------- Démarrage ---------- */
 async function start() {
   if (!SUPA_URL || !SUPA_KEY || !window.supabase) { show("setup"); return; }
@@ -291,27 +441,13 @@ async function start() {
   $("authSwitch").onclick = function () { setMode(mode === "login" ? "signup" : "login"); };
   $("authGo").onclick = doAuth;
   $("fPass").onkeydown = function (e) { if (e.key === "Enter") doAuth(); };
-  $("pickBtn").onclick = function () { $("file").click(); };
-  $("file").onchange = async function () {
-    var f = $("file").files[0]; if (!f) return;
-    try {
-      picked = await shrink(f, 1080);
-      $("prevImg").src = URL.createObjectURL(picked);
-      $("prev").classList.remove("hide");
-    } catch (e) { $("pErr").textContent = frErr(e.message); clearPick(); }
-  };
-  $("prevX").onclick = clearPick;
-  $("pubBtn").onclick = publish;
-  $("refresh").onclick = loadFeed;
-  $("logout").onclick = async function () { await sb.auth.signOut(); me = null; show("auth"); setMode("login"); };
-  setInterval(function () {
-    var a = document.activeElement;
-    if (me && !document.hidden && !(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA"))) loadFeed();
-  }, 45000);
+  $("refresh").onclick = function () { route(); };
+  $("logout").onclick = async function () { await sb.auth.signOut(); me = null; clearInterval(timer); show("auth"); setMode("login"); };
+  window.addEventListener("hashchange", route);
   var s = await sb.auth.getSession();
   if (s.data.session) await enter(s.data.session.user); else { show("auth"); setMode("login"); }
 }
 start();
 </script>
 </body>
-  </html>
+</html>
