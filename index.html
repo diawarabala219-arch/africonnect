@@ -54,6 +54,7 @@ a.who{color:inherit;text-decoration:none}
 .c{display:flex;gap:8px;margin-bottom:8px}
 .bub{background:var(--bg);border-radius:16px;padding:7px 12px;font-size:15px;word-wrap:break-word;min-width:0}
 .bub b{display:block;font-size:13px}
+.nb{font-size:13px}
 .del{background:none;border:0;color:var(--mut);font-size:12px;padding:0 0 0 8px}
 .cin{display:flex;gap:6px}
 .cin input{flex:1;border-radius:20px}
@@ -140,6 +141,29 @@ h3.sec{margin:6px 4px 8px;font-size:17px}
 .sheet{width:100%;max-width:620px;margin:0 auto;height:88vh;height:88dvh;background:#fff;border-radius:18px 18px 0 0;display:flex;flex-direction:column;overflow:hidden}
 .sheet .card.chat{flex:1;height:auto;margin:0;min-height:0;display:flex;flex-direction:column}
 .xb{background:none;border:0;font-size:32px;line-height:1;color:var(--brand);padding:0 8px}
+.vf{color:var(--brand);font-weight:800}
+.chips{display:flex;gap:8px;padding:8px 12px;background:#fff;margin-bottom:8px}
+.chips button{flex:1;background:var(--bg);border:0;border-radius:20px;padding:9px 6px;font-weight:700;font-size:14px}
+.rp{position:absolute;left:8px;bottom:50px;background:#fff;border-radius:30px;box-shadow:0 4px 18px rgba(0,0,0,.3);display:flex;padding:4px 6px;z-index:5}
+.rp button{background:none;border:0;font-size:30px;padding:2px 5px;transition:transform .1s}
+.rp button:active{transform:scale(1.4)}
+.pc{position:relative}
+.sh{border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:10px}
+.sh .time{margin-bottom:4px}
+.gcard{display:flex;gap:12px;align-items:center;padding:10px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.gcard:last-child{border-bottom:0}
+.gic{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#0866ff,#0a7d3b);color:#fff;display:grid;place-items:center;font-weight:800;font-size:22px;flex:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 8px}
+.lst{background:#fff;border-radius:12px;overflow:hidden;border:1px solid var(--line);display:flex;flex-direction:column}
+.lst img,.lst .noimg{width:100%;height:150px;object-fit:cover;background:var(--soft);display:block}
+.lst .bd2{padding:8px;flex:1}
+.lst .pr{font-weight:800;font-size:17px}
+.lst button{border:0;background:var(--soft);color:var(--brand);font-weight:700;padding:9px;margin:0 8px 8px;border-radius:9px}
+.rules{position:fixed;inset:0;z-index:70;background:#fff;overflow-y:auto;padding:16px 18px calc(30px + env(safe-area-inset-bottom))}
+.rules h2{margin:6px 0 10px}
+.rules li{margin-bottom:8px}
+.rules .btn{margin-top:18px}
+.inp2{margin-bottom:8px}
 </style>
 </head>
 <body>
@@ -154,6 +178,8 @@ h3.sec{margin:6px 4px 8px;font-size:17px}
     <p class="err" id="authErr"></p>
     <button class="btn" id="authGo" type="button">Se connecter</button>
     <button class="link" id="authSwitch" type="button">Pas de compte ? Créer un compte</button>
+    <button class="link" id="authForgot" type="button" style="font-weight:600;margin-top:0">Mot de passe oublié ?</button>
+    <p class="time" style="text-align:center;margin:6px 0 0">En continuant, tu acceptes les <a href="#" id="authRules" style="color:var(--brand)">règles de la communauté</a>.</p>
   </div>
 </div>
 
@@ -165,9 +191,12 @@ h3.sec{margin:6px 4px 8px;font-size:17px}
   </div>
   <div class="menu hide" id="menu">
     <button type="button" id="mInst" class="hide">📲 Installer l'application</button>
+    <button type="button" id="mGrp">👥 Groupes et pages</button>
+    <button type="button" id="mMkt">🛍️ Marché</button>
     <button type="button" id="mInv">💚 Inviter des amis</button>
     <button type="button" id="mProf">👤 Mon profil</button>
     <button type="button" id="mRef">🔄 Actualiser</button>
+    <button type="button" id="mRules">📜 Règles et sécurité</button>
     <button type="button" id="mOut">🚪 Se déconnecter</button>
   </div>
   <nav class="nav">
@@ -190,9 +219,10 @@ var SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 var AI_URL = "https://feredou-ia--diawarabala219.replit.app";
 
 var $ = function (id) { return document.getElementById(id); };
-var rid = 0, sb = null, me = null, prof = { name: "", avatar_url: null, bio: "" }, mode = "login", busy = false, open = {}, timer = null, badgeTimer = null, fr = [];
+var blocked = {}, rid = 0, sb = null, me = null, prof = { name: "", avatar_url: null, bio: "" }, mode = "login", busy = false, open = {}, timer = null, badgeTimer = null, fr = [];
 var UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
-var POST_SEL = "id,body,image_url,created_at,user_id,profiles!posts_user_id_fkey(name,avatar_url),likes(user_id),comments(id,body,created_at,user_id,profiles!comments_user_id_fkey(name,avatar_url))";
+var POST_SEL = "id,body,image_url,video_url,group_id,shared_name,shared_body,shared_image,created_at,user_id,profiles!posts_user_id_fkey(name,avatar_url,verified),likes(user_id,kind),comments(id,body,created_at,user_id,profiles!comments_user_id_fkey(name,avatar_url,verified))";
+var RX = { like: ["👍", "J'aime"], love: ["❤️", "J'adore"], haha: ["😂", "Haha"], wow: ["😮", "Wouah"], sad: ["😢", "Triste"], angry: ["😡", "Grr"] };
 
 function h(tag, props, kids) {
   var e = document.createElement(tag);
@@ -214,6 +244,48 @@ function ago(iso) {
   return new Date(iso).toLocaleDateString("fr-FR");
 }
 function ini(n) { return (n || "?").trim().charAt(0).toUpperCase() || "?"; }
+function nm(p, extra) {
+  var d = h("div", { cls: "name" + (extra ? " " + extra : ""), text: (p && p.name) || "Membre" });
+  if (p && p.verified) d.appendChild(h("span", { cls: "vf", text: " ✔", title: "Compte vérifié" }));
+  return d;
+}
+function linkify(txt) {
+  var f = document.createDocumentFragment(), re = /(https?:\/\/[^\s]+)/g, last = 0, m;
+  while ((m = re.exec(txt))) {
+    if (m.index > last) f.appendChild(document.createTextNode(txt.slice(last, m.index)));
+    f.appendChild(h("a", { href: m[1], target: "_blank", rel: "noopener", text: m[1], style: "color:inherit;text-decoration:underline;word-break:break-all" }));
+    last = m.index + m[1].length;
+  }
+  if (last < txt.length) f.appendChild(document.createTextNode(txt.slice(last)));
+  return f;
+}
+function sheetMenu(title, items) {
+  var ov = h("div", { cls: "aiov" }), sh = h("div", { cls: "sheet", style: "height:auto;padding:8px 0 calc(12px + env(safe-area-inset-bottom))" });
+  if (title) sh.appendChild(h("div", { cls: "time", text: title, style: "text-align:center;padding:8px" }));
+  items.forEach(function (it) {
+    sh.appendChild(h("button", { type: "button", text: it[0], style: "display:block;width:100%;text-align:left;background:none;border:0;padding:15px 20px;font-size:17px;font-weight:600" + (it[2] ? ";color:var(--red)" : ""), onclick: function () { ov.remove(); if (it[1]) it[1](); } }));
+  });
+  sh.appendChild(h("button", { type: "button", text: "Annuler", style: "display:block;width:100%;background:none;border:0;padding:15px 20px;font-size:17px;color:var(--mut)", onclick: function () { ov.remove(); } }));
+  ov.onclick = function (e) { if (e.target === ov) ov.remove(); };
+  ov.appendChild(sh); document.body.appendChild(ov);
+}
+function showRules() {
+  var ov = h("div", { cls: "rules" });
+  ov.appendChild(h("h2", { text: "📜 Règles de la communauté" }));
+  var ul = h("ul", { style: "padding-left:20px" });
+  ["Respecte les autres : pas d'insultes, de haine, de harcèlement ni de menaces.",
+   "Pas de nudité, de violence choquante ni de contenu qui touche aux enfants.",
+   "Pas d'arnaques, de faux comptes, de faux produits ni de spam.",
+   "Ne publie pas les photos ou informations privées d'une personne sans son accord.",
+   "Sur le Marché, rencontre les vendeurs dans un lieu public et ne paie jamais à l'avance à un inconnu.",
+   "Tu peux signaler (⚠️) ou bloquer (🚫) toute personne ou publication qui ne respecte pas ces règles.",
+   "Les comptes qui ne respectent pas ces règles peuvent être suspendus."].forEach(function (t) { ul.appendChild(h("li", { text: t })); });
+  ov.appendChild(ul);
+  ov.appendChild(h("h2", { text: "🔒 Confidentialité", style: "margin-top:20px" }));
+  ov.appendChild(h("p", { text: "Ton e-mail reste privé. Ton nom, ta photo, tes publications, tes stories et ton profil sont visibles par les membres d'AfriConnect. Tes messages privés ne sont visibles que par toi et la personne concernée. Tu peux supprimer tes publications à tout moment." }));
+  ov.appendChild(h("button", { cls: "btn", type: "button", text: "J'ai compris", onclick: function () { ov.remove(); } }));
+  document.body.appendChild(ov);
+}
 function avEl(p, size) {
   var st = "width:" + size + "px;height:" + size + "px;font-size:" + Math.round(size * 0.42) + "px";
   if (p && p.avatar_url) return h("img", { cls: "av", src: p.avatar_url, alt: "", style: st });
@@ -264,9 +336,10 @@ async function doAuth() {
 }
 async function enter(user) {
   me = user;
-  var r = await sb.from("profiles").select("name,avatar_url,bio").eq("id", user.id).maybeSingle();
+  var r = await sb.from("profiles").select("name,avatar_url,bio,verified").eq("id", user.id).maybeSingle();
   var d = r.data || {};
-  prof = { name: d.name || (user.user_metadata && user.user_metadata.name) || "Membre", avatar_url: d.avatar_url || null, bio: d.bio || "" };
+  prof = { name: d.name || (user.user_metadata && user.user_metadata.name) || "Membre", avatar_url: d.avatar_url || null, bio: d.bio || "", verified: !!d.verified };
+  await loadBlocks();
   show("app");
   route();
   refreshBadges();
@@ -289,11 +362,15 @@ function shrink(file, max, q) {
     im.src = url;
   });
 }
-async function upload(blob, tag) {
-  var path = me.id + "/" + tag + Date.now() + ".jpg";
-  var up = await sb.storage.from("photos").upload(path, blob, { contentType: "image/jpeg" });
+async function upload(blob, tag, ext, ctype) {
+  var path = me.id + "/" + tag + Date.now() + "." + (ext || "jpg");
+  var up = await sb.storage.from("photos").upload(path, blob, { contentType: ctype || "image/jpeg" });
   if (up.error) throw up.error;
   return sb.storage.from("photos").getPublicUrl(path).data.publicUrl;
+}
+async function loadBlocks() {
+  var b = await sb.from("blocks").select("blocked");
+  blocked = {}; (b.data || []).forEach(function (x) { blocked[x.blocked] = true; });
 }
 
 /* ---------- Amis, badges ---------- */
@@ -340,6 +417,7 @@ async function refreshBadges() {
     var a = await sb.from("messages").select("id", { count: "exact", head: true }).eq("receiver", me.id).eq("read", false);
     var b = await sb.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", me.id).eq("read", false);
     setBadge("msgs", a.count || 0); setBadge("alerts", b.count || 0);
+    var tot = (a.count || 0) + (b.count || 0); document.title = (tot ? "(" + tot + ") " : "") + "AfriConnect";
   } catch (e) {}
 }
 
@@ -354,6 +432,9 @@ function route() {
   else if (parts[0] === "messages") { r = "msgs"; if (parts[1]) viewChat(main, parts[1]); else viewConvos(main); }
   else if (parts[0] === "alertes") { r = "alerts"; viewAlerts(main); }
   else if (parts[0] === "profil") { r = "profile"; viewProfile(main, parts[1] || me.id); }
+  else if (parts[0] === "groupes") { r = ""; viewGroups(main); }
+  else if (parts[0] === "groupe" && parts[1]) { r = ""; viewGroup(main, parts[1]); }
+  else if (parts[0] === "marche") { r = ""; viewMarket(main); }
   else { viewFeed(main); }
   Array.prototype.forEach.call(document.querySelectorAll(".nav a"), function (a) {
     a.classList.toggle("on", a.getAttribute("data-r") === r && !(r === "profile" && parts[1] && parts[1] !== me.id));
@@ -377,7 +458,7 @@ async function loadSuggest(box) {
   await loadFr();
   var r = await sb.from("profiles").select("id,name,avatar_url").order("created_at", { ascending: false }).limit(30);
   if (r.error || !box.isConnected) return;
-  var rows = r.data.filter(function (m) { return m.id !== me.id && relOf(m.id).state === "none"; }).slice(0, 10);
+  var rows = r.data.filter(function (m) { return m.id !== me.id && relOf(m.id).state === "none" && !blocked[m.id]; }).slice(0, 10);
   if (!rows.length) return;
   box.appendChild(h("div", { cls: "name", text: "Personnes que vous pouvez connaître", style: "margin-bottom:8px" }));
   var strip = h("div", { cls: "stories", style: "padding:0;margin:0" });
@@ -392,8 +473,14 @@ async function loadSuggest(box) {
 }
 
 /* ---------- Accueil ---------- */
+function chips() {
+  var b1 = h("button", { type: "button", text: "👥 Groupes et pages", onclick: function () { location.hash = "#/groupes"; } });
+  var b2 = h("button", { type: "button", text: "🛍️ Marché", onclick: function () { location.hash = "#/marche"; } });
+  return h("div", { cls: "chips" }, [b1, b2]);
+}
 function viewFeed(main) {
   main.appendChild(composer(function () { loadPosts(feed, null); }));
+  main.appendChild(chips());
   var sr = h("div", { cls: "stories" }); main.appendChild(sr); loadStories(sr);
   var sg = h("div", { cls: "card" }); main.appendChild(sg); loadSuggest(sg);
   main.appendChild(inviteCard());
@@ -404,41 +491,54 @@ function viewFeed(main) {
     if (!document.hidden && !(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA"))) loadPosts(feed, null);
   }, 45000);
 }
-function composer(done) {
-  var picked = null;
+function composer(done, groupId) {
+  var picked = null, isVid = false, pickedFile = null;
   var card = h("div", { cls: "card" });
   var ta = h("textarea", { maxlength: "2000", placeholder: "À quoi pensez-vous, " + prof.name.split(" ")[0] + " ?" });
   var err = h("p", { cls: "err" });
   var prevImg = h("img", { alt: "" });
-  var prevX = h("button", { type: "button", text: "×", "aria-label": "Retirer la photo" });
-  var prev = h("div", { cls: "prev hide" }, [prevImg, prevX]);
-  var file = h("input", { type: "file", accept: "image/*", cls: "hide" });
-  var pick = h("button", { cls: "ph", type: "button", text: "📷 Photo" });
+  var prevVid = h("video", { controls: "", playsinline: "", style: "width:100%;border-radius:12px;max-height:260px;display:block" });
+  var prevX = h("button", { type: "button", text: "×", "aria-label": "Retirer" });
+  var prev = h("div", { cls: "prev hide" }, [prevImg, prevVid, prevX]);
+  var file = h("input", { type: "file", accept: "image/*,video/*", cls: "hide" });
+  var pick = h("button", { cls: "ph", type: "button", text: "📷 Photo / vidéo" });
   var go = h("button", { cls: "go", type: "button", text: "Publier" });
-  var pill = h("button", { cls: "pill", id: "pill", type: "button", text: "À quoi pensez-vous ?" });
+  var pill = h("button", { cls: "pill", id: "pill", type: "button", text: groupId ? "Écrire dans ce groupe…" : "À quoi pensez-vous ?" });
   var phb = h("button", { cls: "phb", type: "button", "aria-label": "Photo" });
   phb.innerHTML = '<svg viewBox="0 0 24 24" fill="#2eb85c"><rect x="2" y="3" width="20" height="18" rx="3"/><circle cx="8.5" cy="9" r="2" fill="#fff"/><path d="M3 19l6-6 4 4 3-3 5 5z" fill="#fff"/></svg>Photo';
   var top = h("div", { cls: "cmp" }, [avEl(prof, 44), pill, phb]);
   var exp = h("div", { cls: "exp hide" }, [ta, prev, h("div", { cls: "tools" }, [pick, go])]);
   card.appendChild(top); card.appendChild(exp); card.appendChild(file); card.appendChild(err);
   function expand() { exp.classList.remove("hide"); pill.classList.add("hide"); phb.classList.add("hide"); ta.focus(); }
-  function clear() { picked = null; file.value = ""; prev.classList.add("hide"); }
+  function clear() { picked = null; pickedFile = null; isVid = false; file.value = ""; prev.classList.add("hide"); prevImg.classList.remove("hide"); prevVid.classList.add("hide"); prevVid.removeAttribute("src"); }
   pill.onclick = expand;
   phb.onclick = function () { expand(); file.click(); };
   pick.onclick = function () { file.click(); };
   prevX.onclick = clear;
   file.onchange = async function () {
     var f = file.files[0]; if (!f) return;
-    try { picked = await shrink(f, 1080, 0.8); prevImg.src = URL.createObjectURL(picked); prev.classList.remove("hide"); }
-    catch (e) { err.textContent = frErr(e.message); clear(); }
+    err.textContent = "";
+    try {
+      if (/^video\//.test(f.type)) {
+        if (f.size > 15 * 1024 * 1024) { err.textContent = "Vidéo trop lourde (15 Mo maximum, ~30 secondes)."; clear(); return; }
+        isVid = true; pickedFile = f; picked = f;
+        prevVid.src = URL.createObjectURL(f); prevVid.classList.remove("hide"); prevImg.classList.add("hide");
+      } else {
+        isVid = false; picked = await shrink(f, 1080, 0.8);
+        prevImg.src = URL.createObjectURL(picked); prevImg.classList.remove("hide"); prevVid.classList.add("hide");
+      }
+      prev.classList.remove("hide");
+    } catch (e) { err.textContent = frErr(e.message); clear(); }
   };
   go.onclick = async function () {
     var body = ta.value.trim(); err.textContent = "";
     if (!body && !picked) { err.textContent = "Écris quelque chose ou ajoute une photo."; return; }
     go.disabled = true; go.textContent = "Envoi…";
     try {
-      var imgUrl = picked ? await upload(picked, "") : null;
-      var ins = await sb.from("posts").insert({ body: body || null, image_url: imgUrl });
+      var row = { body: body || null, group_id: groupId || null };
+      if (picked && isVid) { var ex = (/mp4|webm|quicktime/.exec(pickedFile.type) || ["mp4"])[0]; row.video_url = await upload(picked, "v-", ex === "quicktime" ? "mov" : ex, pickedFile.type || "video/mp4"); }
+      else if (picked) row.image_url = await upload(picked, "");
+      var ins = await sb.from("posts").insert(row);
       if (ins.error) throw ins.error;
       ta.value = ""; clear(); exp.classList.add("hide"); pill.classList.remove("hide"); phb.classList.remove("hide"); done();
     } catch (e) { err.textContent = frErr(e.message); }
@@ -500,56 +600,108 @@ function viewStory(list, i, pr) {
   ov.onclick = function () { ov.remove(); if (i + 1 < list.length) viewStory(list, i + 1, pr); };
   document.body.appendChild(ov);
 }
-async function loadPosts(container, userId) {
+async function loadPosts(container, userId, groupId) {
   if (busy) return; busy = true;
   var q = sb.from("posts").select(POST_SEL);
   if (userId) q = q.eq("user_id", userId);
+  if (groupId) q = q.eq("group_id", groupId); else if (!userId) q = q.is("group_id", null);
   var r = await q.order("created_at", { ascending: false }).limit(50);
   busy = false;
   if (!container.isConnected) return;
   container.textContent = "";
   if (r.error) { container.appendChild(h("div", { cls: "empty", text: frErr(r.error.message) })); return; }
-  if (!r.data.length) { container.appendChild(h("div", { cls: "empty", text: userId ? "Aucune publication pour l'instant." : "Aucune publication pour l'instant. Sois le premier !" })); return; }
-  r.data.forEach(function (p) { container.appendChild(postCard(p, function () { loadPosts(container, userId); })); });
+  var rows = r.data.filter(function (p) { return !blocked[p.user_id]; });
+  if (!rows.length) { container.appendChild(h("div", { cls: "empty", text: (userId || groupId) ? "Aucune publication pour l'instant." : "Aucune publication pour l'instant. Sois le premier !" })); return; }
+  rows.forEach(function (p) { container.appendChild(postCard(p, function () { loadPosts(container, userId, groupId); })); });
 }
 function postCard(p, reload) {
   var pr = p.profiles || { name: "Membre" };
-  var liked = p.likes.some(function (l) { return l.user_id === me.id; });
+  var mine = null;
+  p.likes.forEach(function (l) { if (l.user_id === me.id) mine = l; });
   var cms = p.comments.slice().sort(function (a, b) { return new Date(a.created_at) - new Date(b.created_at); });
-  var card = h("div", { cls: "card" });
-  var who = h("a", { cls: "who", href: "#/profil/" + p.user_id }, [h("div", { cls: "name", text: pr.name })]);
+  var card = h("div", { cls: "card pc" });
+  var who = h("a", { cls: "who", href: "#/profil/" + p.user_id }, [nm(pr)]);
   var head = h("div", { cls: "row" }, [
     h("a", { cls: "who", href: "#/profil/" + p.user_id }, [avEl(pr, 42)]),
-    h("div", { style: "flex:1;min-width:0" }, [who, h("div", { cls: "time", text: ago(p.created_at) + " · 🌍" })])
+    h("div", { style: "flex:1;min-width:0" }, [who, h("div", { cls: "time", text: ago(p.created_at) + " · " + (p.group_id ? "👥" : "🌍") })])
   ]);
-  if (p.user_id === me.id) head.appendChild(h("button", { cls: "more", text: "•••", "aria-label": "Options", onclick: async function () {
-    if (!confirm("Supprimer cette publication ?")) return;
-    await sb.from("posts").delete().eq("id", p.id); reload();
+  head.appendChild(h("button", { cls: "more", text: "•••", "aria-label": "Options", onclick: function () {
+    if (p.user_id === me.id) sheetMenu("Ta publication", [["🗑 Supprimer la publication", async function () {
+      if (!confirm("Supprimer cette publication ?")) return;
+      await sb.from("posts").delete().eq("id", p.id); reload();
+    }, true]]);
+    else sheetMenu(pr.name, [
+      ["⚠️ Signaler cette publication", async function () {
+        var why = prompt("Pourquoi la signaler ? (spam, nudité, haine, arnaque…)"); if (!why) return;
+        var x = await sb.from("reports").insert({ target_type: "post", target_id: String(p.id), reason: why.slice(0, 200) });
+        alert(x.error ? frErr(x.error.message) : "Merci. Nous allons vérifier cette publication.");
+      }],
+      ["🚫 Bloquer " + pr.name, async function () {
+        if (!confirm("Bloquer " + pr.name + " ? Vous ne verrez plus vos publications ni vos messages.")) return;
+        var x = await sb.from("blocks").insert({ blocked: p.user_id });
+        if (x.error) { alert(frErr(x.error.message)); return; }
+        blocked[p.user_id] = true; reload();
+      }, true]
+    ]);
   } }));
   card.appendChild(head);
   if (p.body) card.appendChild(h("div", { cls: "body", text: p.body }));
+  if (p.shared_name) {
+    var sh = h("div", { cls: "sh" }, [h("div", { cls: "time", text: "↗ Publication de " + p.shared_name })]);
+    if (p.shared_body) sh.appendChild(h("div", { text: p.shared_body, style: "white-space:pre-wrap;word-wrap:break-word" }));
+    if (p.shared_image) sh.appendChild(h("img", { src: p.shared_image, alt: "Photo", loading: "lazy", style: "width:100%;border-radius:8px;margin-top:8px;display:block" }));
+    card.appendChild(sh);
+  }
   if (p.image_url) card.appendChild(h("img", { cls: "img", src: p.image_url, alt: "Photo", loading: "lazy" }));
+  if (p.video_url) card.appendChild(h("video", { cls: "img", src: p.video_url, controls: "", playsinline: "", preload: "metadata" }));
+  var cnt = {}, tot = p.likes.length;
+  p.likes.forEach(function (l) { var k = RX[l.kind] ? l.kind : "like"; cnt[k] = (cnt[k] || 0) + 1; });
+  var top3 = Object.keys(cnt).sort(function (a, b) { return cnt[b] - cnt[a]; }).slice(0, 3).map(function (k) { return RX[k][0]; }).join("");
   card.appendChild(h("div", { cls: "stats" }, [
-    h("span", { text: p.likes.length ? "👍 " + p.likes.length : "" }),
+    h("span", { text: tot ? top3 + " " + tot : "" }),
     h("span", { text: cms.length ? cms.length + " commentaire" + (cms.length > 1 ? "s" : "") : "" })
   ]));
-  var likeBtn = h("button", { cls: liked ? "on" : "", text: "👍 J'aime" });
-  likeBtn.onclick = async function () {
+  var mk = mine ? (RX[mine.kind] || RX.like) : null;
+  var likeBtn = h("button", { cls: mine ? "on" : "", text: mk ? mk[0] + " " + mk[1] : "👍 J'aime" });
+  var rp = h("div", { cls: "rp hide" });
+  async function react(kind) {
     likeBtn.disabled = true;
-    if (liked) await sb.from("likes").delete().eq("post_id", p.id).eq("user_id", me.id);
-    else await sb.from("likes").insert({ post_id: p.id });
+    if (mine && mine.kind === kind) await sb.from("likes").delete().eq("post_id", p.id).eq("user_id", me.id);
+    else if (mine) await sb.from("likes").update({ kind: kind }).eq("post_id", p.id).eq("user_id", me.id);
+    else await sb.from("likes").insert({ post_id: p.id, kind: kind });
     reload();
+  }
+  Object.keys(RX).forEach(function (k) {
+    rp.appendChild(h("button", { type: "button", text: RX[k][0], "aria-label": RX[k][1], onclick: function (e) { e.stopPropagation(); rp.classList.add("hide"); react(k); } }));
+  });
+  var pt = null, lp = false;
+  likeBtn.addEventListener("pointerdown", function () { lp = false; clearTimeout(pt); pt = setTimeout(function () { lp = true; rp.classList.remove("hide"); }, 420); });
+  ["pointerup", "pointerleave", "pointercancel"].forEach(function (ev) { likeBtn.addEventListener(ev, function () { clearTimeout(pt); }); });
+  likeBtn.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+  likeBtn.onclick = function () {
+    if (lp) { lp = false; return; }
+    if (!rp.classList.contains("hide")) { rp.classList.add("hide"); return; }
+    react(mine ? mine.kind : "like");
   };
   var cmBtn = h("button", { text: "💬 Commenter" });
-  var shBtn = h("button", { text: "↗ Partager", onclick: async function () {
+  var shBtn = h("button", { text: "↗ Partager", onclick: function () {
     var txt = (pr.name + " sur AfriConnect : " + (p.body || "")).slice(0, 200), link = location.origin + location.pathname;
-    try { if (navigator.share) await navigator.share({ title: "AfriConnect", text: txt, url: link }); else { await navigator.clipboard.writeText(txt + " " + link); shBtn.textContent = "✓ Copié"; } } catch (e) {}
+    sheetMenu("Partager", [
+      ["🔁 Partager sur mon profil", async function () {
+        var x = await sb.from("posts").insert({ shared_name: pr.name, shared_body: p.body || p.shared_body || null, shared_image: p.image_url || p.shared_image || null });
+        alert(x.error ? frErr(x.error.message) : "Partagé sur ton profil ✓");
+      }],
+      ["📤 Envoyer à des amis (WhatsApp…)", async function () {
+        try { if (navigator.share) await navigator.share({ title: "AfriConnect", text: txt, url: link }); else window.open("https://wa.me/?text=" + encodeURIComponent(txt + " " + link), "_blank"); } catch (e) {}
+      }]
+    ]);
   } });
   card.appendChild(h("div", { cls: "acts" }, [likeBtn, cmBtn, shBtn]));
+  card.appendChild(rp);
   var box = h("div", { cls: "cm" + (open[p.id] ? "" : " hide") });
   cms.forEach(function (c) {
     var cp = c.profiles || { name: "Membre" };
-    var bub = h("div", { cls: "bub" }, [h("b", { text: cp.name }), h("span", { text: c.body })]);
+    var bub = h("div", { cls: "bub" }, [nm(cp, "nb"), h("span", { text: c.body })]);
     if (c.user_id === me.id) bub.appendChild(h("button", { cls: "del", text: "Supprimer", onclick: async function () {
       await sb.from("comments").delete().eq("id", c.id); reload();
     } }));
@@ -579,7 +731,7 @@ async function viewProfile(main, id) {
   var own = id === me.id;
   var d = own ? prof : null;
   if (!own) {
-    var r = await sb.from("profiles").select("name,avatar_url,bio").eq("id", id).maybeSingle();
+    var r = await sb.from("profiles").select("name,avatar_url,bio,verified").eq("id", id).maybeSingle();
     d = r.data;
     await loadFr();
     if (my !== rid) return;
@@ -589,7 +741,7 @@ async function viewProfile(main, id) {
   card.appendChild(h("div", { cls: "cover" }));
   var pf = h("div", { cls: "pf" });
   pf.appendChild(h("div", {}, [avEl(d, 104)]));
-  pf.appendChild(h("h2", { text: d.name }));
+  var h2 = h("h2", { text: d.name }); if (d.verified) h2.appendChild(h("span", { cls: "vf", text: " ✔" })); pf.appendChild(h2);
   pf.appendChild(h("p", { text: d.bio || (own ? "Ajoute une courte présentation de toi." : "") }));
   if (own) {
     var file = h("input", { type: "file", accept: "image/*", cls: "hide" });
@@ -621,6 +773,21 @@ async function viewProfile(main, id) {
     var fa = friendActions(id, function () { route(); });
     fa.style.justifyContent = "center";
     pf.appendChild(fa);
+    var isB = !!blocked[id], br = h("div", { cls: "fa", style: "justify-content:center;margin-top:4px" });
+    var bb = h("button", { cls: "g", type: "button", text: isB ? "✅ Débloquer" : "🚫 Bloquer" });
+    bb.onclick = async function () {
+      if (!isB && !confirm("Bloquer " + d.name + " ?")) return;
+      var x = isB ? await sb.from("blocks").delete().eq("blocked", id).eq("blocker", me.id) : await sb.from("blocks").insert({ blocked: id });
+      if (x.error) { alert(frErr(x.error.message)); return; }
+      await loadBlocks(); route();
+    };
+    var rb = h("button", { cls: "g", type: "button", text: "⚠️ Signaler" });
+    rb.onclick = async function () {
+      var why = prompt("Pourquoi signaler ce profil ?"); if (!why) return;
+      var x = await sb.from("reports").insert({ target_type: "user", target_id: id, reason: why.slice(0, 200) });
+      alert(x.error ? frErr(x.error.message) : "Merci. Nous allons vérifier ce profil.");
+    };
+    br.appendChild(bb); br.appendChild(rb); pf.appendChild(br);
   }
   card.appendChild(pf);
   main.appendChild(card);
@@ -641,7 +808,7 @@ async function viewMembers(main) {
   main.appendChild(h("h3", { cls: "sec", text: "Membres d'AfriConnect" }));
   main.appendChild(card);
   await loadFr();
-  var r = await sb.from("profiles").select("id,name,avatar_url,bio").order("created_at", { ascending: false }).limit(200);
+  var r = await sb.from("profiles").select("id,name,avatar_url,bio,verified").order("created_at", { ascending: false }).limit(200);
   if (my !== rid) return;
   if (r.error) { list.appendChild(h("div", { cls: "empty", text: frErr(r.error.message) })); return; }
   var byId = {}; r.data.forEach(function (m) { byId[m.id] = m; });
@@ -655,20 +822,20 @@ async function viewMembers(main) {
       var m = byId[f.requester] || { name: "Membre" };
       c.appendChild(h("div", { cls: "mem" }, [
         h("a", { cls: "who", href: "#/profil/" + f.requester }, [avEl(m, 46)]),
-        h("div", { cls: "info" }, [h("div", { cls: "name", text: m.name }), friendActions(f.requester, redraw)])
+        h("div", { cls: "info" }, [nm(m), friendActions(f.requester, redraw)])
       ]));
     });
     inv.appendChild(c);
   }
   function draw() {
     var t = q.value.trim().toLowerCase(); list.textContent = "";
-    var rows = r.data.filter(function (m) { return m.id !== me.id && (!t || (m.name || "").toLowerCase().indexOf(t) >= 0); });
+    var rows = r.data.filter(function (m) { return m.id !== me.id && !blocked[m.id] && (!t || (m.name || "").toLowerCase().indexOf(t) >= 0); });
     if (!rows.length) { list.appendChild(h("div", { cls: "empty", text: "Aucun autre membre pour l'instant. Invite tes amis !" })); return; }
     rows.forEach(function (m) {
       list.appendChild(h("div", { cls: "mem" }, [
         h("a", { cls: "who", href: "#/profil/" + m.id }, [avEl(m, 46)]),
         h("div", { cls: "info" }, [
-          h("a", { cls: "who", href: "#/profil/" + m.id }, [h("div", { cls: "name", text: m.name })]),
+          h("a", { cls: "who", href: "#/profil/" + m.id }, [nm(m)]),
           h("div", { cls: "bio", text: m.bio || "" }),
           friendActions(m.id, redraw)
         ])
@@ -698,7 +865,7 @@ async function viewConvos(main) {
   var last = {}, order = [];
   r.data.forEach(function (m) {
     var o = m.sender === me.id ? m.receiver : m.sender;
-    if (!last[o]) { last[o] = m; order.push(o); }
+    if (!last[o] && !blocked[o]) { last[o] = m; order.push(o); }
   });
   if (!order.length) { card.appendChild(h("div", { cls: "empty", text: "Aucune conversation. Va dans « Membres » pour écrire à quelqu'un." })); return; }
   var p = await sb.from("profiles").select("id,name,avatar_url").in("id", order);
@@ -773,11 +940,16 @@ async function viewChat(main, id) {
   var pr = (await sb.from("profiles").select("id,name,avatar_url").eq("id", id).maybeSingle()).data;
   if (my !== rid) return;
   if (!pr) { main.appendChild(h("div", { cls: "empty", text: "Membre introuvable." })); return; }
+  function startCall() {
+    var room = "AfriConnect" + [me.id, id].sort().join("").replace(/-/g, "").slice(0, 28), link = "https://meet.jit.si/" + room;
+    if (!confirm("Lancer un appel vidéo avec " + pr.name + " ?")) return;
+    sb.from("messages").insert({ receiver: id, body: "📞 Appel vidéo, rejoins-moi : " + link }).then(function () { window.open(link, "_blank"); load(true); });
+  }
   var msgs = h("div", { cls: "msgs" });
   var inp = h("input", { type: "text", maxlength: "2000", placeholder: "Écris un message…" });
   var send = h("button", { type: "button", text: "Envoyer" });
   var card = h("div", { cls: "card chat" }, [
-    h("div", { cls: "hd" }, [h("a", { href: "#/messages", text: "‹" }), h("a", { cls: "who", href: "#/profil/" + id }, [avEl(pr, 38)]), h("div", { cls: "name", text: pr.name })]),
+    h("div", { cls: "hd" }, [h("a", { href: "#/messages", text: "‹" }), h("a", { cls: "who", href: "#/profil/" + id }, [avEl(pr, 38)]), h("div", { cls: "name", text: pr.name }), h("button", { cls: "xb", type: "button", text: "📞", "aria-label": "Appel vidéo", style: "margin-left:auto;font-size:24px", onclick: startCall })]),
     msgs,
     h("div", { cls: "send" }, [inp, send])
   ]);
@@ -793,7 +965,7 @@ async function viewChat(main, id) {
       key = k; msgs.textContent = "";
       if (!r.data.length) msgs.appendChild(h("div", { cls: "empty", text: "Dis bonjour à " + pr.name.split(" ")[0] + " 👋" }));
       r.data.forEach(function (m) {
-        msgs.appendChild(h("div", { cls: "m" + (m.sender === me.id ? " me" : "") }, [document.createTextNode(m.body), h("small", { text: ago(m.created_at) })]));
+        msgs.appendChild(h("div", { cls: "m" + (m.sender === me.id ? " me" : "") }, [linkify(m.body), h("small", { text: ago(m.created_at) })]));
       });
       if (near) msgs.scrollTop = msgs.scrollHeight;
     }
@@ -815,6 +987,164 @@ async function viewChat(main, id) {
   await load(true);
   msgs.scrollTop = msgs.scrollHeight;
   timer = setInterval(function () { if (!document.hidden) load(false); }, 4000);
+}
+
+/* ---------- Groupes et pages ---------- */
+async function viewGroups(main) {
+  var my = rid;
+  main.appendChild(h("h3", { cls: "sec", text: "Groupes et pages" }));
+  var top = h("div", { cls: "card" });
+  var bNew = h("button", { cls: "btn", type: "button", text: "➕ Créer un groupe ou une page", style: "margin-top:0" });
+  var q = h("input", { type: "text", placeholder: "Chercher un groupe…", style: "margin-top:10px" });
+  top.appendChild(bNew); top.appendChild(q);
+  var card = h("div", { cls: "card" });
+  main.appendChild(top); main.appendChild(card);
+  bNew.onclick = function () {
+    sheetMenu("Que veux-tu créer ?", [
+      ["👥 Un groupe : tous les membres peuvent publier", function () { createGroup("group"); }],
+      ["📄 Une page : toi seul publies (commerce, marque, artiste…)", function () { createGroup("page"); }]
+    ]);
+  };
+  async function createGroup(kind) {
+    var name = prompt("Nom (2 à 60 lettres) :"); if (!name || name.trim().length < 2) return;
+    var desc = prompt("Description courte (facultatif) :") || "";
+    var x = await sb.from("groups").insert({ name: name.trim().slice(0, 60), description: desc.trim().slice(0, 200), kind: kind }).select("id").single();
+    if (x.error) { alert(/groups/.test(x.error.message) ? "Lance d'abord le script SQL de la version 7." : frErr(x.error.message)); return; }
+    location.hash = "#/groupe/" + x.data.id;
+  }
+  var g = await sb.from("groups").select("id,name,description,kind,group_members(count)").order("created_at", { ascending: false }).limit(100);
+  var mm = await sb.from("group_members").select("group_id").eq("user_id", me.id);
+  if (my !== rid) return;
+  if (g.error) { card.appendChild(h("div", { cls: "empty", text: /groups/.test(g.error.message) ? "Lance d'abord le script SQL de la version 7." : frErr(g.error.message) })); return; }
+  var mine = {}; (mm.data || []).forEach(function (x) { mine[x.group_id] = true; });
+  var rows = g.data.slice().sort(function (a, b) { return (mine[b.id] ? 1 : 0) - (mine[a.id] ? 1 : 0); });
+  function draw() {
+    var t = q.value.trim().toLowerCase(); card.textContent = "";
+    var f = rows.filter(function (x) { return !t || x.name.toLowerCase().indexOf(t) >= 0; });
+    if (!f.length) { card.appendChild(h("div", { cls: "empty", text: "Aucun groupe pour l'instant. Crée le premier !" })); return; }
+    f.forEach(function (x) {
+      var n = x.group_members && x.group_members[0] ? x.group_members[0].count : 0;
+      card.appendChild(h("div", { cls: "gcard", onclick: function () { location.hash = "#/groupe/" + x.id; } }, [
+        h("div", { cls: "gic", text: ini(x.name) }),
+        h("div", { cls: "info", style: "flex:1;min-width:0" }, [
+          h("div", { cls: "name", text: x.name }),
+          h("div", { cls: "time", text: (x.kind === "page" ? "Page" : "Groupe") + " · " + n + (x.kind === "page" ? " abonné" : " membre") + (n > 1 ? "s" : "") + (mine[x.id] ? " · ✓ Rejoint" : "") }),
+          x.description ? h("div", { cls: "bio", text: x.description }) : null
+        ])
+      ]));
+    });
+  }
+  q.oninput = draw; draw();
+}
+async function viewGroup(main, id) {
+  var my = rid;
+  if (!UUID.test(id)) { main.appendChild(h("div", { cls: "empty", text: "Groupe introuvable." })); return; }
+  var g = (await sb.from("groups").select("id,name,description,kind,owner,group_members(count)").eq("id", id).maybeSingle()).data;
+  var jm = (await sb.from("group_members").select("user_id").eq("group_id", id).eq("user_id", me.id)).data || [];
+  if (my !== rid) return;
+  if (!g) { main.appendChild(h("div", { cls: "empty", text: "Groupe introuvable." })); return; }
+  var joined = jm.length > 0, isPage = g.kind === "page", owner = g.owner === me.id;
+  var n = g.group_members && g.group_members[0] ? g.group_members[0].count : 0;
+  var card = h("div", { cls: "card" });
+  card.appendChild(h("div", { cls: "cover" }));
+  var pf = h("div", { cls: "pf" });
+  pf.appendChild(h("div", { cls: "gic", text: ini(g.name), style: "width:96px;height:96px;font-size:40px;border:4px solid #fff;border-radius:20px" }));
+  pf.appendChild(h("h2", { text: g.name }));
+  pf.appendChild(h("div", { cls: "time", text: (isPage ? "Page" : "Groupe public") + " · " + n + (isPage ? " abonné" : " membre") + (n > 1 ? "s" : "") }));
+  if (g.description) pf.appendChild(h("p", { text: g.description }));
+  var btns = h("div", { cls: "btns" });
+  if (!owner) {
+    var jb = h("button", { type: "button", text: joined ? (isPage ? "✓ Abonné" : "✓ Membre · Quitter") : (isPage ? "➕ S'abonner" : "➕ Rejoindre le groupe"), style: joined ? "" : "background:var(--brand);color:#fff" });
+    jb.onclick = async function () {
+      jb.disabled = true;
+      var x = joined ? await sb.from("group_members").delete().eq("group_id", id).eq("user_id", me.id) : await sb.from("group_members").insert({ group_id: id });
+      if (x.error) { alert(frErr(x.error.message)); jb.disabled = false; return; }
+      route();
+    };
+    btns.appendChild(jb);
+  }
+  btns.appendChild(h("button", { type: "button", text: "📤 Inviter", onclick: function () {
+    var link = location.origin + location.pathname + "#/groupe/" + id, txt = "Rejoins « " + g.name + " » sur AfriConnect : " + link;
+    if (navigator.share) navigator.share({ title: g.name, text: txt }).catch(function () {}); else window.open("https://wa.me/?text=" + encodeURIComponent(txt), "_blank");
+  } }));
+  if (owner) btns.appendChild(h("button", { type: "button", text: "🗑 Supprimer", style: "color:var(--red)", onclick: async function () {
+    if (!confirm("Supprimer définitivement « " + g.name + " » et ses publications ?")) return;
+    await sb.from("groups").delete().eq("id", id); location.hash = "#/groupes";
+  } }));
+  pf.appendChild(btns); card.appendChild(pf); main.appendChild(card);
+  var feed = h("div", {});
+  if (owner || (!isPage && joined)) main.appendChild(composer(function () { loadPosts(feed, null, id); }, id));
+  else main.appendChild(h("div", { cls: "card time", text: isPage ? "Seul le propriétaire publie sur cette page." : "Rejoins le groupe pour publier." }));
+  main.appendChild(feed);
+  loadPosts(feed, null, id);
+}
+
+/* ---------- Marché ---------- */
+async function viewMarket(main) {
+  var my = rid;
+  main.appendChild(h("h3", { cls: "sec", text: "🛍️ Marché" }));
+  var top = h("div", { cls: "card" });
+  var bSell = h("button", { cls: "btn", type: "button", text: "➕ Vendre un article", style: "margin-top:0" });
+  var form = h("div", { cls: "hide", style: "margin-top:10px" });
+  var fT = h("input", { type: "text", placeholder: "Titre (ex : Téléphone Tecno)", maxlength: "80", cls: "inp2" });
+  var fP = h("input", { type: "text", placeholder: "Prix (ex : 350 000 GNF)", maxlength: "30", cls: "inp2" });
+  var fC = h("input", { type: "text", placeholder: "Ville / quartier", maxlength: "40", cls: "inp2" });
+  var fD = h("textarea", { placeholder: "Description (état, contact WhatsApp…)", maxlength: "500", cls: "inp2" });
+  var fF = h("input", { type: "file", accept: "image/*", cls: "hide" });
+  var fB = h("button", { cls: "ph", type: "button", text: "📷 Ajouter une photo" });
+  var fG = h("button", { cls: "go", type: "button", text: "Publier l'article" });
+  var fE = h("p", { cls: "err" });
+  var pic = null;
+  fB.onclick = function () { fF.click(); };
+  fF.onchange = async function () { var f = fF.files[0]; if (!f) return; try { pic = await shrink(f, 1000, 0.8); fB.textContent = "✓ Photo ajoutée"; } catch (e) { fE.textContent = frErr(e.message); } };
+  fG.onclick = async function () {
+    fE.textContent = "";
+    if (fT.value.trim().length < 2) { fE.textContent = "Écris le titre de l'article."; return; }
+    fG.disabled = true; fG.textContent = "Envoi…";
+    try {
+      var url = pic ? await upload(pic, "m-") : null;
+      var x = await sb.from("listings").insert({ title: fT.value.trim(), price: fP.value.trim(), city: fC.value.trim(), description: fD.value.trim(), image_url: url });
+      if (x.error) throw x.error;
+      route();
+    } catch (e) { fE.textContent = /listings/.test(String(e.message)) ? "Lance d'abord le script SQL de la version 7." : frErr(e.message); fG.disabled = false; fG.textContent = "Publier l'article"; }
+  };
+  form.appendChild(fT); form.appendChild(fP); form.appendChild(fC); form.appendChild(fD);
+  form.appendChild(h("div", { cls: "tools" }, [fB, fF, fG])); form.appendChild(fE);
+  bSell.onclick = function () { form.classList.toggle("hide"); };
+  var q = h("input", { type: "text", placeholder: "Chercher un article…", style: "margin-top:10px" });
+  top.appendChild(bSell); top.appendChild(form); top.appendChild(q);
+  main.appendChild(top);
+  var grid = h("div", { cls: "grid2" });
+  main.appendChild(grid);
+  var r = await sb.from("listings").select("id,title,price,city,description,image_url,sold,created_at,seller,profiles!listings_seller_fkey(name,avatar_url,verified)").order("created_at", { ascending: false }).limit(100);
+  if (my !== rid) return;
+  if (r.error) { grid.appendChild(h("div", { cls: "empty", text: /listings/.test(r.error.message) ? "Lance d'abord le script SQL de la version 7." : frErr(r.error.message), style: "grid-column:1/3" })); return; }
+  var rows = r.data.filter(function (x) { return !blocked[x.seller]; });
+  function draw() {
+    var t = q.value.trim().toLowerCase(); grid.textContent = "";
+    var f = rows.filter(function (x) { return !t || x.title.toLowerCase().indexOf(t) >= 0; });
+    if (!f.length) { grid.appendChild(h("div", { cls: "empty", text: "Aucun article pour l'instant. Sois le premier à vendre !", style: "grid-column:1/3" })); return; }
+    f.forEach(function (x) {
+      var sp = x.profiles || { name: "Vendeur" };
+      var c = h("div", { cls: "lst" }, [
+        x.image_url ? h("img", { src: x.image_url, alt: x.title, loading: "lazy" }) : h("div", { cls: "noimg" }),
+        h("div", { cls: "bd2" }, [
+          h("div", { cls: "pr", text: (x.sold ? "VENDU · " : "") + (x.price || "Prix à discuter") }),
+          h("div", { text: x.title, style: "font-weight:600" }),
+          h("div", { cls: "time", text: (x.city ? x.city + " · " : "") + sp.name })
+        ])
+      ]);
+      if (x.description) c.querySelector(".bd2").appendChild(h("div", { cls: "bio", text: x.description, style: "white-space:normal;max-height:40px" }));
+      if (x.seller === me.id) {
+        c.appendChild(h("button", { type: "button", text: x.sold ? "↩ Remettre en vente" : "✓ Marquer vendu", onclick: async function () { await sb.from("listings").update({ sold: !x.sold }).eq("id", x.id); route(); } }));
+        c.appendChild(h("button", { type: "button", text: "🗑 Supprimer", style: "color:var(--red)", onclick: async function () { if (!confirm("Supprimer cet article ?")) return; await sb.from("listings").delete().eq("id", x.id); route(); } }));
+      } else {
+        c.appendChild(h("button", { type: "button", text: "💬 Contacter", onclick: function () { location.hash = "#/messages/" + x.seller; } }));
+      }
+      grid.appendChild(c);
+    });
+  }
+  q.oninput = draw; draw();
 }
 
 /* ---------- Notifications ---------- */
@@ -853,10 +1183,26 @@ async function start() {
   window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); dip = e; $("mInst").classList.remove("hide"); });
   $("mInst").onclick = async function () { if (dip) { dip.prompt(); await dip.userChoice; dip = null; $("mInst").classList.add("hide"); } };
   $("mInv").onclick = inviteFriends;
+  $("mGrp").onclick = function () { location.hash = "#/groupes"; };
+  $("mMkt").onclick = function () { location.hash = "#/marche"; };
+  $("mRules").onclick = showRules;
+  $("authRules").onclick = function (e) { e.preventDefault(); showRules(); };
+  $("authForgot").onclick = async function () {
+    var mail = $("fMail").value.trim();
+    if (!mail) { $("authErr").textContent = "Écris d'abord ton e-mail dans la case ci-dessus."; return; }
+    var r = await sb.auth.resetPasswordForEmail(mail, { redirectTo: location.origin + location.pathname });
+    $("authErr").textContent = r.error ? frErr(r.error.message) : "E-mail envoyé ✓ Ouvre le lien reçu pour choisir un nouveau mot de passe.";
+  };
+  sb.auth.onAuthStateChange(function (ev) {
+    if (ev === "PASSWORD_RECOVERY") {
+      var p = prompt("Choisis ton nouveau mot de passe (6 caractères minimum) :");
+      if (p && p.length >= 6) sb.auth.updateUser({ password: p }).then(function (r) { alert(r.error ? frErr(r.error.message) : "Mot de passe changé ✓"); });
+    }
+  });
   if ("serviceWorker" in navigator) { try { navigator.serviceWorker.register("sw.js").catch(function () {}); } catch (e) {} }
   $("mProf").onclick = function () { location.hash = "#/profil"; };
   $("mRef").onclick = function () { route(); refreshBadges(); };
-  $("mOut").onclick = async function () { await sb.auth.signOut(); me = null; clearInterval(timer); clearInterval(badgeTimer); show("auth"); setMode("login"); };
+  $("mOut").onclick = async function () { await sb.auth.signOut(); me = null; blocked = {}; clearInterval(timer); clearInterval(badgeTimer); show("auth"); setMode("login"); };
   $("bPlus").onclick = function () {
     if (location.hash && location.hash !== "#/") location.hash = "#/";
     setTimeout(function () { var p = document.getElementById("pill"); window.scrollTo(0, 0); if (p) p.click(); }, 60);
