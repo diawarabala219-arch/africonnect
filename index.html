@@ -132,6 +132,14 @@ h3.sec{margin:6px 4px 8px;font-size:17px}
 .sv .bar i{flex:1;height:3px;background:#fff5;border-radius:2px}
 .sv .bar i.on{background:#fff}
 .more{background:none;border:0;font-size:22px;color:var(--mut);padding:0 6px;letter-spacing:1px}
+.fab{position:fixed;right:16px;bottom:calc(22px + env(safe-area-inset-bottom));width:64px;height:64px;border:0;border-radius:50%;padding:0;background:conic-gradient(from 20deg,#0866ff,#9b4dff,#ff4f8b,#ffb347,#0866ff);box-shadow:0 4px 16px rgba(0,0,0,.35);z-index:30;display:grid;place-items:center}
+.fab .in{width:52px;height:52px;border-radius:50%;background:#fff;display:grid;place-items:center}
+.fab svg{width:28px;height:28px}
+.fab:active{transform:scale(.94)}
+.aiov{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.45);display:flex;align-items:flex-end}
+.sheet{width:100%;max-width:620px;margin:0 auto;height:88vh;height:88dvh;background:#fff;border-radius:18px 18px 0 0;display:flex;flex-direction:column;overflow:hidden}
+.sheet .card.chat{flex:1;height:auto;margin:0;min-height:0;display:flex;flex-direction:column}
+.xb{background:none;border:0;font-size:32px;line-height:1;color:var(--brand);padding:0 8px}
 </style>
 </head>
 <body>
@@ -170,6 +178,7 @@ h3.sec{margin:6px 4px 8px;font-size:17px}
     <a href="#/profil" data-r="profile" aria-label="Profil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>Profil</a>
   </nav>
   <div class="wrap" id="main"></div>
+  <button class="fab" id="fab" type="button" aria-label="Feredou IA"><span class="in"><svg viewBox="0 0 24 24"><defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0866ff"/><stop offset="1" stop-color="#ff4f8b"/></linearGradient></defs><path fill="url(#gg)" d="M12 2l2.2 6.3L21 10l-6.8 1.7L12 18l-2.2-6.3L3 10l6.8-1.7zM19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg></span></button>
 </div>
 
 <div id="setup" class="auth hide"><div class="card"><div class="logo">AfriConnect</div><p class="sub">La base n'est pas encore reliée.</p></div></div>
@@ -677,7 +686,7 @@ async function viewConvos(main) {
   var card = h("div", { cls: "card" });
   main.appendChild(card);
   if (AI_URL) {
-    var ai = h("div", { cls: "conv", onclick: function () { location.hash = "#/messages/ia"; } }, [
+    var ai = h("div", { cls: "conv", onclick: function () { openAI(); } }, [
       h("div", { cls: "av", text: "IA", style: "width:48px;height:48px;font-size:18px;background:linear-gradient(135deg,#1d6ff2,#0a7d3b)" }),
       h("div", { cls: "info" }, [h("div", { cls: "name", text: "Feredou IA ✨" }), h("div", { cls: "pv", text: "Ton assistant intelligent. Pose-lui une question." })])
     ]);
@@ -705,7 +714,20 @@ async function viewConvos(main) {
     ]));
   });
 }
-function viewAI(main) {
+function openAI() {
+  if (document.getElementById("aiov")) return;
+  var ov = h("div", { cls: "aiov", id: "aiov" }), sheet = h("div", { cls: "sheet" });
+  ov.appendChild(sheet);
+  ov.onclick = function (e) { if (e.target === ov) closeAI(); };
+  document.body.appendChild(ov);
+  $("fab").classList.add("hide");
+  viewAI(sheet, closeAI);
+}
+function closeAI() {
+  var o = document.getElementById("aiov"); if (o) o.remove();
+  var f = $("fab"); if (f) f.classList.remove("hide");
+}
+function viewAI(main, close) {
   var KEY = "afri_ia_" + me.id, hist = [];
   try { hist = JSON.parse(localStorage.getItem(KEY) || "[]"); } catch (e) {}
   var msgs = h("div", { cls: "msgs" });
@@ -713,7 +735,7 @@ function viewAI(main) {
   var send = h("button", { type: "button", text: "Envoyer" });
   var logo = h("div", { cls: "av", text: "IA", style: "width:38px;height:38px;font-size:15px;background:linear-gradient(135deg,#0866ff,#0a7d3b)" });
   main.appendChild(h("div", { cls: "card chat" }, [
-    h("div", { cls: "hd" }, [h("a", { href: "#/messages", text: "‹" }), logo, h("div", {}, [h("div", { cls: "name", text: "Feredou IA ✨" }), h("div", { cls: "time", text: "Assistant intelligent" })])]),
+    h("div", { cls: "hd" }, [close ? h("button", { cls: "xb", type: "button", text: "×", "aria-label": "Fermer", onclick: close }) : h("a", { href: "#/messages", text: "‹" }), logo, h("div", {}, [h("div", { cls: "name", text: "Feredou IA ✨" }), h("div", { cls: "time", text: "Assistant intelligent" })])]),
     msgs, h("div", { cls: "send" }, [inp, send])
   ]));
   function save() { try { localStorage.setItem(KEY, JSON.stringify(hist.slice(-40))); } catch (e) {} }
@@ -826,6 +848,7 @@ async function start() {
   var menu = $("menu");
   $("bMenu").onclick = function (e) { e.stopPropagation(); menu.classList.toggle("hide"); };
   document.addEventListener("click", function () { menu.classList.add("hide"); });
+  $("fab").onclick = openAI;
   var dip = null;
   window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); dip = e; $("mInst").classList.remove("hide"); });
   $("mInst").onclick = async function () { if (dip) { dip.prompt(); await dip.userChoice; dip = null; $("mInst").classList.add("hide"); } };
