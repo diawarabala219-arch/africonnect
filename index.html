@@ -4,66 +4,142 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AfriConnect</title>
+    <!-- Chargement de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #f0f2f5; }
-        /* Barre de navigation basse (style mobile) */
+        body { font-family: Arial, sans-serif; margin: 0; background: #f0f2f5; padding-bottom: 70px; }
+        .header { background: #1877f2; color: white; padding: 15px; text-align: center; font-size: 20px; font-weight: bold; }
+        
+        /* Contenu des onglets */
+        .tab-content { display: none; padding: 15px; }
+        .tab-content.active { display: block; }
+
+        /* Style du formulaire et des posts */
+        .card { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        input, textarea { width: 100%; padding: 10px; margin: 5px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; }
+        button { background: #1877f2; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
+        
+        /* Barre de navigation basse */
         .nav-bar {
             position: fixed; bottom: 0; width: 100%; background: white;
             display: flex; justify-content: space-around; padding: 10px 0;
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1); z-index: 1000;
         }
-        .nav-item { text-align: center; cursor: pointer; color: #65676b; font-size: 14px; }
-        .nav-item.active { color: #1877f2; font-weight: bold; }
-        
-        /* Contenu des onglets */
-        .tab-content { display: none; padding: 20px; padding-bottom: 70px; }
-        .tab-content.active { display: block; }
+        .nav-item { text-align: center; cursor: pointer; color: #65676b; font-size: 14px; font-weight: bold; }
+        .nav-item.active { color: #1877f2; }
     </style>
 </head>
 <body>
 
-    <!-- Onglet 1 : Accueil -->
+    <div class="header">AfriConnect</div>
+
+    <!-- ONGLET 1 : ACCUEIL -->
     <div id="tab-accueil" class="tab-content active">
-        <h2>Fil d'actualité AfriConnect</h2>
-        <p>Ici s'affichent les publications des utilisateurs.</p>
+        <!-- Formulaire de publication -->
+        <div class="card">
+            <h3>Créer une publication</h3>
+            <input type="text" id="auteurInput" placeholder="Votre nom (ex: Balla Moussa Diawara)">
+            <textarea id="contenuInput" placeholder="Quoi de neuf, Balla ?"></textarea>
+            <button onclick="publier()">Publier</button>
+        </div>
+
+        <!-- Fil d'actualité -->
+        <h3>Fil d'actualité</h3>
+        <div id="filActualite">Chargement des publications...</div>
     </div>
 
-    <!-- Onglet 2 : Vidéos / Reels -->
+    <!-- ONGLET 2 : VIDÉOS -->
     <div id="tab-videos" class="tab-content">
-        <h2>Vidéos et Reels</h2>
-        <p>Espace dédié aux vidéos de la communauté.</p>
+        <div class="card">
+            <h3>🎬 Vidéos et Reels</h3>
+            <p>Bientôt, vous pourrez publier et regarder des vidéos ici comme sur Facebook !</p>
+        </div>
     </div>
 
-    <!-- Onglet 3 : Boutique (Marketplace) -->
+    <!-- ONGLET 3 : BOUTIQUE -->
     <div id="tab-boutique" class="tab-content">
-        <h2>Boutique AfriConnect</h2>
-        <p>Découvrez les produits en vente près de chez vous !</p>
+        <div class="card">
+            <h3>🛍️ Boutique AfriConnect</h3>
+            <p>Découvrez les articles en vente par la communauté.</p>
+        </div>
     </div>
 
-    <!-- Barre de navigation en bas -->
+    <!-- Barre de navigation -->
     <div class="nav-bar">
         <div class="nav-item active" onclick="changerOnglet('accueil', this)">🏠 Accueil</div>
         <div class="nav-item" onclick="changerOnglet('videos', this)">🎬 Vidéos</div>
         <div class="nav-item" onclick="changerOnglet('boutique', this)">🛍️ Boutique</div>
     </div>
 
+    <!-- Script JavaScript -->
     <script>
-        // Fonction pour basculer d'un onglet à l'autre
+        // Gestion des onglets
         function changerOnglet(nomOnglet, element) {
-            // Cacher tous les onglets
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            // Retirer la classe active de tous les boutons
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-
-            // Afficher l'onglet choisi et activer le bouton
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            
             document.getElementById('tab-' + nomOnglet).classList.add('active');
             element.classList.add('active');
         }
-    </script>
 
+        // Configuration Supabase (Remplacez par vos clés)
+        const SUPABASE_URL = 'VOTRE_URL_SUPABASE';
+        const SUPABASE_ANON_KEY = 'VOTRE_CLE_ANON';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Charger les posts
+        async function chargerPosts() {
+            const { data: posts, error } = await supabase
+                .from('posts')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            const filDiv = document.getElementById('filActualite');
+            if (error) {
+                filDiv.innerHTML = "Erreur de chargement.";
+                return;
+            }
+            if (posts.length === 0) {
+                filDiv.innerHTML = "<p>Aucune publication pour le moment.</p>";
+                return;
+            }
+
+            filDiv.innerHTML = "";
+            posts.forEach(post => {
+                filDiv.innerHTML += `
+                    <div class="card">
+                        <strong>${post.auteur}</strong>
+                        <p>${post.contenu}</p>
+                        <small style="color: gray;">${new Date(post.created_at).toLocaleString()}</small>
+                    </div>
+                `;
+            });
+        }
+
+        // Publier un message
+        async function publier() {
+            const auteur = document.getElementById('auteurInput').value;
+            const contenu = document.getElementById('contenuInput').value;
+
+            if (!auteur || !contenu) {
+                alert("Veuillez remplir votre nom et votre message !");
+                return;
+            }
+
+            const { error } = await supabase
+                .from('posts')
+                .insert([{ auteur: auteur, contenu: contenu }]);
+
+            if (error) {
+                alert("Erreur lors de la publication.");
+            } else {
+                document.getElementById('contenuInput').value = "";
+                chargerPosts();
+            }
+        }
+
+        // Charger les publications au démarrage
+        chargerPosts();
+    </script>
 </body>
 </html>
