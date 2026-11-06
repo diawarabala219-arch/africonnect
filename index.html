@@ -209,6 +209,7 @@ h3.sec{margin:6px 4px 8px;font-size:17px}
   <div style="font-size:34px;font-weight:800;letter-spacing:.5px">AfriConnect</div>
   <div id="splashMsg" style="opacity:.9">Chargement…</div>
   <button id="splashRetry" type="button" style="display:none;background:#fff;color:#1877f2;border:0;border-radius:22px;padding:12px 22px;font-weight:800;font-size:16px" onclick="location.reload()">Réessayer</button>
+  <button id="splashReset" type="button" style="display:none;background:transparent;color:#fff;border:1px solid #fff;border-radius:22px;padding:10px 18px;font-weight:700" onclick="try{Object.keys(localStorage).forEach(function(k){if(/^sb-/.test(k))localStorage.removeItem(k)})}catch(e){};location.reload()">Me reconnecter à zéro</button>
 </div>
 
 <div id="auth" class="auth hide">
@@ -1487,9 +1488,4 @@ async function start() {
   $("mInv").onclick = inviteFriends;
   $("mGrp").onclick = function () { location.hash = "#/groupes"; };
   $("mMkt").onclick = function () { location.hash = "#/marche"; };
-  $("mRules").onclick = showRules;
-  $("authRules").onclick = function (e) { e.preventDefault(); showRules(); };
-  $("authForgot").onclick = async function () {
-    var mail = $("fMail").value.trim();
-    if (!mail) { $("authErr").textContent = "Écris d'abord ton e-mail dans la case ci-dessus."; return; }
-    var r = await sb.auth.resetP
+ 
