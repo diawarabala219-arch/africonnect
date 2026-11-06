@@ -256,9 +256,10 @@ h3.sec{margin:6px 4px 8px;font-size:17px}
 var SUPA_URL = "https://edsvhqwetulvypocdjku.supabase.co";
 var SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkc3ZocXdldHVsdnlwb2Nkamt1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzNzQ0OTcsImV4cCI6MjEwODk1MDQ5N30.0opGuYQPIc0hZQlUNlCk9h8kPXD-G4IdaAge2ioiKTM";
 var AI_URL = "https://feredou-ia--diawarabala219.replit.app";
+var JITSI = "https://meet.ffmuc.net/";
 
 var $ = function (id) { return document.getElementById(id); };
-var blocked = {}, rid = 0, sb = null, me = null, prof = { name: "", avatar_url: null, bio: "" }, mode = "login", busy = false, open = {}, timer = null, badgeTimer = null, fr = [];
+var callTimer = null, seenCalls = {}, blocked = {}, rid = 0, sb = null, me = null, prof = { name: "", avatar_url: null, bio: "" }, mode = "login", busy = false, open = {}, timer = null, badgeTimer = null, fr = [];
 var UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 var POST_SEL = "id,body,image_url,video_url,group_id,shared_name,shared_body,shared_image,created_at,user_id,profiles!posts_user_id_fkey(name,avatar_url,verified),likes(user_id,kind),comments(id,body,created_at,user_id,profiles!comments_user_id_fkey(name,avatar_url,verified))";
 var RX = { like: ["👍", "J'aime"], love: ["❤️", "J'adore"], haha: ["😂", "Haha"], wow: ["😮", "Wouah"], sad: ["😢", "Triste"], angry: ["😡", "Grr"] };
@@ -375,15 +376,16 @@ async function doAuth() {
 }
 async function enter(user) {
   me = user;
-  var r = await sb.from("profiles").select("name,avatar_url,bio,verified").eq("id", user.id).maybeSingle();
+  var r = await profRow(user.id, "name,avatar_url,bio,verified");
   var d = r.data || {};
-  prof = { name: d.name || (user.user_metadata && user.user_metadata.name) || "Membre", avatar_url: d.avatar_url || null, bio: d.bio || "", verified: !!d.verified };
+  prof = { name: d.name || (user.user_metadata && user.user_metadata.name) || "Membre", avatar_url: d.avatar_url || null, bio: d.bio || "", verified: !!d.verified, phone: d.phone || "" };
   await loadBlocks();
   show("app");
   route();
   refreshBadges();
   clearInterval(badgeTimer);
   badgeTimer = setInterval(refreshBadges, 30000);
+  clearInterval(callTimer); callTimer = setInterval(checkCalls, 10000); checkCalls();
 }
 
 /* ---------- Photos ---------- */
@@ -406,6 +408,37 @@ async function upload(blob, tag, ext, ctype) {
   var up = await sb.storage.from("photos").upload(path, blob, { contentType: ctype || "image/jpeg" });
   if (up.error) throw up.error;
   return sb.storage.from("photos").getPublicUrl(path).data.publicUrl;
+}
+async function profRow(id, base) {
+  var r = await sb.from("profiles").select(base + ",phone").eq("id", id).maybeSingle();
+  if (r.error) r = await sb.from("profiles").select(base).eq("id", id).maybeSingle();
+  return r;
+}
+async function checkCalls() {
+  if (!me || document.hidden) return;
+  try {
+    var since = new Date(Date.now() - 120000).toISOString();
+    var r = await sb.from("messages").select("id,sender,body,created_at").eq("receiver", me.id).eq("read", false).gte("created_at", since).like("body", "📞 Appel vidéo%").order("created_at", { ascending: false }).limit(1);
+    if (r.error || !r.data || !r.data.length) return;
+    var m = r.data[0]; if (seenCalls[m.id] || blocked[m.sender]) return;
+    seenCalls[m.id] = true;
+    var link = (m.body.match(/https?:\/\/\S+/) || [""])[0]; if (!link) return;
+    var p = (await sb.from("profiles").select("name,avatar_url").eq("id", m.sender).maybeSingle()).data || { name: "Un membre" };
+    showCall(m, link, p);
+  } catch (e) {}
+}
+function showCall(m, link, p) {
+  var old = document.getElementById("callbar"); if (old) old.remove();
+  var bar = h("div", { id: "callbar", style: "position:fixed;top:0;left:0;right:0;z-index:90;background:#0b1b3a;color:#fff;padding:calc(12px + env(safe-area-inset-top)) 14px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(0,0,0,.45)" });
+  bar.appendChild(avEl(p, 46));
+  bar.appendChild(h("div", { style: "flex:1;min-width:0" }, [h("div", { text: p.name, style: "font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" }), h("div", { text: "📞 Appel vidéo entrant…", style: "font-size:14px;opacity:.85" })]));
+  bar.appendChild(h("button", { type: "button", text: "Ignorer", style: "background:#d6336c;color:#fff;border:0;border-radius:20px;padding:10px 14px;font-weight:700", onclick: function () { bar.remove(); } }));
+  bar.appendChild(h("button", { type: "button", text: "Répondre", style: "background:#25d366;color:#fff;border:0;border-radius:20px;padding:10px 14px;font-weight:700", onclick: async function () {
+    bar.remove(); await sb.from("messages").update({ read: true }).eq("id", m.id); window.open(link, "_blank"); refreshBadges();
+  } }));
+  document.body.appendChild(bar);
+  try { if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 300]); } catch (e) {}
+  setTimeout(function () { if (bar.isConnected) bar.remove(); }, 45000);
 }
 async function loadBlocks() {
   var b = await sb.from("blocks").select("blocked");
@@ -775,7 +808,7 @@ async function viewProfile(main, id) {
   var own = id === me.id;
   var d = own ? prof : null;
   if (!own) {
-    var r = await sb.from("profiles").select("name,avatar_url,bio,verified").eq("id", id).maybeSingle();
+    var r = await profRow(id, "name,avatar_url,bio,verified");
     d = r.data;
     await loadFr();
     if (my !== rid) return;
@@ -811,12 +844,22 @@ async function viewProfile(main, id) {
       if (u.error) { msg.textContent = frErr(u.error.message); return; }
       prof.bio = t; route();
     };
-    pf.appendChild(h("div", { cls: "btns" }, [bPhoto, bBio, file]));
+    var bPhone = h("button", { type: "button", text: prof.phone ? "📱 WhatsApp : +" + prof.phone : "📱 Ajouter mon numéro WhatsApp" });
+    bPhone.onclick = async function () {
+      var t = prompt("Ton numéro WhatsApp avec l'indicatif, sans + ni espaces (ex : 224613754349).\nLes membres pourront t'appeler. Laisse vide pour l'effacer.", prof.phone || "");
+      if (t === null) return;
+      t = t.replace(/\D/g, "").slice(0, 15);
+      var u = await sb.from("profiles").update({ phone: t || null }).eq("id", me.id);
+      if (u.error) { msg.textContent = /phone/.test(u.error.message) ? "Lance d'abord le script SQL de la version 10." : frErr(u.error.message); return; }
+      prof.phone = t; route();
+    };
+    pf.appendChild(h("div", { cls: "btns" }, [bPhoto, bBio, bPhone, file]));
     pf.appendChild(msg);
   } else {
     var fa = friendActions(id, function () { route(); });
     fa.style.justifyContent = "center";
     pf.appendChild(fa);
+    if (d.phone) pf.appendChild(h("div", { cls: "fa", style: "justify-content:center;margin-top:4px" }, [h("button", { type: "button", text: "📱 Appeler sur WhatsApp", style: "background:#25d366;color:#fff", onclick: function () { window.open("https://wa.me/" + String(d.phone).replace(/\D/g, ""), "_blank"); } })]));
     var isB = !!blocked[id], br = h("div", { cls: "fa", style: "justify-content:center;margin-top:4px" });
     var bb = h("button", { cls: "g", type: "button", text: isB ? "✅ Débloquer" : "🚫 Bloquer" });
     bb.onclick = async function () {
@@ -986,7 +1029,7 @@ async function viewChat(main, id) {
   var my = rid;
   if (id === "ia") { viewAI(main); return; }
   if (!UUID.test(id) || id === me.id) { main.appendChild(h("div", { cls: "empty", text: "Conversation introuvable." })); return; }
-  var pr = (await sb.from("profiles").select("id,name,avatar_url,bio,verified").eq("id", id).maybeSingle()).data;
+  var pr = (await profRow(id, "id,name,avatar_url,bio,verified")).data;
   await loadFr();
   if (my !== rid) return;
   if (!pr) { main.appendChild(h("div", { cls: "empty", text: "Membre introuvable." })); return; }
@@ -1036,6 +1079,7 @@ async function viewChat(main, id) {
     sheetMenu(pr.name, [
       ["👤 Voir le profil", function () { location.hash = "#/profil/" + id; }],
       ["📞 Appel vidéo", startCall],
+      pr.phone ? ["📱 Appeler sur WhatsApp", function () { window.open("https://wa.me/" + String(pr.phone).replace(/\D/g, ""), "_blank"); }] : ["📱 Pas de numéro WhatsApp", function () {}],
       ["⚠️ Signaler", async function () {
         var why = prompt("Pourquoi signaler cette personne ?"); if (!why) return;
         var x = await sb.from("reports").insert({ target_type: "user", target_id: id, reason: why.slice(0, 200) });
@@ -1050,7 +1094,7 @@ async function viewChat(main, id) {
     ]);
   };
   function startCall() {
-    var room = "AfriConnect" + [me.id, id].sort().join("").replace(/-/g, "").slice(0, 28), link = "https://meet.jit.si/" + room;
+    var room = "AfriConnect" + [me.id, id].sort().join("").replace(/-/g, "").slice(0, 28), link = JITSI + room;
     if (!confirm("Lancer un appel vidéo avec " + pr.name + " ?")) return;
     sb.from("messages").insert({ receiver: id, body: "📞 Appel vidéo, rejoins-moi : " + link }).then(function () { window.open(link, "_blank"); load(true); });
   }
@@ -1441,7 +1485,7 @@ async function start() {
   if ("serviceWorker" in navigator) { try { navigator.serviceWorker.register("sw.js").catch(function () {}); } catch (e) {} }
   $("mProf").onclick = function () { location.hash = "#/profil"; };
   $("mRef").onclick = function () { route(); refreshBadges(); };
-  $("mOut").onclick = async function () { await sb.auth.signOut(); me = null; blocked = {}; clearInterval(timer); clearInterval(badgeTimer); show("auth"); setMode("login"); };
+  $("mOut").onclick = async function () { await sb.auth.signOut(); me = null; blocked = {}; clearInterval(timer); clearInterval(badgeTimer); clearInterval(callTimer); show("auth"); setMode("login"); };
   $("bPlus").onclick = function () {
     if (location.hash && location.hash !== "#/") location.hash = "#/";
     setTimeout(function () { var p = document.getElementById("pill"); window.scrollTo(0, 0); if (p) p.click(); }, 60);
@@ -1452,9 +1496,4 @@ async function start() {
   };
   window.addEventListener("hashchange", route);
   var s = await sb.auth.getSession();
-  if (s.data.session) await enter(s.data.session.user); else { show("auth"); setMode("login"); }
-}
-start();
-</script>
-</body>
-</html>
+  if (s.data.session) await enter(s.data.session.user); else { show("auth"); setMode("login
