@@ -175,6 +175,33 @@ h3.sec{margin:6px 4px 8px;font-size:17px}
 .reel .side button{background:rgba(0,0,0,.5);border:0;color:#fff;border-radius:50%;width:48px;height:48px;font-size:22px}
 .reel .side span{font-size:12px;color:#fff;display:block;text-align:center;margin-top:-8px}
 .reel .side .liked{background:rgba(214,51,108,.85)}
+.inchat .top,.inchat .nav,.inchat .fab{display:none!important}
+.inchat .wrap{padding:0}
+.inchat .chat{height:100vh;height:100dvh;margin:0;border-radius:0;padding:0}
+.inchat .chat .hd{padding:10px 12px}
+.inchat .msgs{padding:6px 12px}
+.inchat .send{display:none}
+.intro{display:flex;flex-direction:column;align-items:center;text-align:center;padding:26px 10px 14px}
+.intro .inm{font-size:24px;margin-top:10px}
+.tm{align-self:center;color:var(--mut);font-size:12px;margin:10px 0 2px}
+.m.big{background:none;font-size:56px;line-height:1.1;padding:0}
+.m.media{background:none;padding:0}
+.m img{display:block;max-width:240px;width:100%;border-radius:16px}
+.m audio{display:block;height:40px;max-width:230px}
+.stt{align-self:flex-end;font-size:12px;color:var(--mut);margin:-2px 4px 4px;display:flex;align-items:center;gap:4px}
+.mbar{display:flex;align-items:center;gap:6px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#fff}
+.mbar .ic{background:none;border:0;padding:4px;display:grid;place-items:center;flex:none}
+.mbar .ic svg{width:30px;height:30px;fill:var(--brand)}
+.mbar .pin{flex:1;position:relative;min-width:0}
+.mbar .pin input{border-radius:22px;background:var(--bg);border-color:transparent;padding:10px 44px 10px 14px}
+.mbar .pin .em{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;font-size:24px;padding:0 4px}
+.emo{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;padding:8px;background:#fff;border-top:1px solid var(--line);max-height:150px;overflow-y:auto}
+.emo button{background:none;border:0;font-size:26px;padding:4px}
+.recb{display:flex;align-items:center;gap:12px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#fff}
+.recb .dot2{width:12px;height:12px;border-radius:50%;background:var(--red);animation:bl 1s infinite}
+@keyframes bl{50%{opacity:.25}}
+.recb .go2{background:var(--brand);color:#fff;border:0;border-radius:20px;padding:9px 18px;font-weight:700}
+.recb .no2{background:none;border:0;color:var(--red);font-weight:700;padding:9px}
 </style>
 </head>
 <body>
@@ -454,7 +481,9 @@ function route() {
     a.classList.toggle("on", a.getAttribute("data-r") === r && !(r === "profile" && parts[1] && parts[1] !== me.id));
   });
   window.scrollTo(0, 0);
-  var fb = $("fab"); if (fb && !document.getElementById("aiov")) fb.classList.toggle("hide", r === "videos");
+  var inchat = parts[0] === "messages" && !!parts[1] && parts[1] !== "ia";
+  document.body.classList.toggle("inchat", inchat);
+  var fb = $("fab"); if (fb && !document.getElementById("aiov")) fb.classList.toggle("hide", r === "videos" || inchat);
 }
 
 /* ---------- Inviter ---------- */
@@ -948,40 +977,175 @@ function viewAI(main, close) {
   inp.onkeydown = function (e) { if (e.key === "Enter") doSend(); };
   draw();
 }
+function fmtT(iso) {
+  var d = new Date(iso), n = new Date(), hh = ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+  if (d.toDateString() === n.toDateString()) return hh;
+  return ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + " " + hh;
+}
 async function viewChat(main, id) {
   var my = rid;
   if (id === "ia") { viewAI(main); return; }
   if (!UUID.test(id) || id === me.id) { main.appendChild(h("div", { cls: "empty", text: "Conversation introuvable." })); return; }
-  var pr = (await sb.from("profiles").select("id,name,avatar_url").eq("id", id).maybeSingle()).data;
+  var pr = (await sb.from("profiles").select("id,name,avatar_url,bio,verified").eq("id", id).maybeSingle()).data;
+  await loadFr();
   if (my !== rid) return;
   if (!pr) { main.appendChild(h("div", { cls: "empty", text: "Membre introuvable." })); return; }
+  var SVG = {
+    cam: '<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="4"/><circle cx="8.5" cy="9" r="2" fill="#fff"/><path d="M3 19l6-6 4 4 3-3 5 5z" fill="#fff"/></svg>',
+    mic: '<svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0h-2a5 5 0 0 1-10 0z"/><rect x="11" y="17" width="2" height="4"/></svg>',
+    like: '<svg viewBox="0 0 24 24"><path d="M2 10h4v11H2zM8 21h9.4a2 2 0 0 0 2-1.6l1.5-7A2 2 0 0 0 19 10h-5l.8-3.8A2.2 2.2 0 0 0 12.6 4L8 10z"/></svg>',
+    send: '<svg viewBox="0 0 24 24"><path d="M2 21l20-9L2 3v7l14 2-14 2z"/></svg>'
+  };
+  function ic(k, label, fn) { var b = h("button", { cls: "ic", type: "button", "aria-label": label }); b.innerHTML = SVG[k]; b.onclick = fn; return b; }
+
+  var msgs = h("div", { cls: "msgs" });
+  var inp = h("input", { type: "text", maxlength: "2000", placeholder: "Message" });
+  var em = h("button", { cls: "em", type: "button", text: "😊", "aria-label": "Emojis" });
+  var fileIn = h("input", { type: "file", accept: "image/*", cls: "hide" });
+  var bCam = ic("cam", "Photo", function () { fileIn.click(); });
+  var bMic = ic("mic", "Message vocal", function () { startRec(); });
+  var bRight = ic("like", "J'aime", function () { if (inp.value.trim()) doSend(); else sendRow({ body: "👍" }); });
+  var bar = h("div", { cls: "mbar" }, [bCam, bMic, h("div", { cls: "pin" }, [inp, em]), bRight, fileIn]);
+  var emo = h("div", { cls: "emo hide" });
+  "😀😂😍🥰😘😎🤩😅😭😡👍👎🙏👏💪🔥❤️💚💛🎉🙌🤝😢😮🤔😴🤗😉😇🥳😜🙈🇬🇳✨💯😁😆😊🤣😋🤤😏😬🙄😱🤯😤😥🫶".match(/\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic})*|\p{RI}\p{RI}/gu).forEach(function (e) {
+    emo.appendChild(h("button", { type: "button", text: e, onclick: function () { inp.value += e; inp.focus(); upd(); } }));
+  });
+  var recb = h("div", { cls: "recb hide" });
+  var recT = h("span", { text: "0:00", style: "font-weight:700;flex:1" });
+  recb.appendChild(h("span", { cls: "dot2" })); recb.appendChild(recT);
+  recb.appendChild(h("button", { cls: "no2", type: "button", text: "Annuler", onclick: function () { stopRec(false); } }));
+  recb.appendChild(h("button", { cls: "go2", type: "button", text: "Envoyer ➤", onclick: function () { stopRec(true); } }));
+  var back = h("a", { href: "#/messages", text: "‹", style: "font-size:34px;line-height:1;color:var(--brand);text-decoration:none;padding:0 6px" });
+  var gear = h("button", { cls: "xb", type: "button", text: "⚙", "aria-label": "Réglages", style: "font-size:26px;color:var(--ink)" });
+  var card = h("div", { cls: "card chat" }, [
+    h("div", { cls: "hd" }, [back, h("a", { cls: "who", href: "#/profil/" + id }, [avEl(pr, 40)]), nm(pr), h("button", { cls: "xb", type: "button", text: "📞", "aria-label": "Appel vidéo", style: "margin-left:auto;font-size:24px", onclick: startCall }), gear]),
+    msgs, emo, h("div", { id: "mfoot" }, [bar, recb])
+  ]);
+  main.appendChild(card);
+  recb.parentNode.insertBefore(recb, bar);
+
+  function upd() {
+    var has = !!inp.value.trim();
+    bRight.innerHTML = has ? SVG.send : SVG.like;
+    bRight.setAttribute("aria-label", has ? "Envoyer" : "J'aime");
+  }
+  inp.oninput = upd;
+  inp.onkeydown = function (e) { if (e.key === "Enter") doSend(); };
+  em.onclick = function () { emo.classList.toggle("hide"); };
+  gear.onclick = function () {
+    sheetMenu(pr.name, [
+      ["👤 Voir le profil", function () { location.hash = "#/profil/" + id; }],
+      ["📞 Appel vidéo", startCall],
+      ["⚠️ Signaler", async function () {
+        var why = prompt("Pourquoi signaler cette personne ?"); if (!why) return;
+        var x = await sb.from("reports").insert({ target_type: "user", target_id: id, reason: why.slice(0, 200) });
+        alert(x.error ? frErr(x.error.message) : "Merci. Nous allons vérifier.");
+      }],
+      ["🚫 Bloquer " + pr.name, async function () {
+        if (!confirm("Bloquer " + pr.name + " ?")) return;
+        var x = await sb.from("blocks").insert({ blocked: id });
+        if (x.error) { alert(frErr(x.error.message)); return; }
+        blocked[id] = true; location.hash = "#/messages";
+      }, true]
+    ]);
+  };
   function startCall() {
     var room = "AfriConnect" + [me.id, id].sort().join("").replace(/-/g, "").slice(0, 28), link = "https://meet.jit.si/" + room;
     if (!confirm("Lancer un appel vidéo avec " + pr.name + " ?")) return;
     sb.from("messages").insert({ receiver: id, body: "📞 Appel vidéo, rejoins-moi : " + link }).then(function () { window.open(link, "_blank"); load(true); });
   }
-  var msgs = h("div", { cls: "msgs" });
-  var inp = h("input", { type: "text", maxlength: "2000", placeholder: "Écris un message…" });
-  var send = h("button", { type: "button", text: "Envoyer" });
-  var card = h("div", { cls: "card chat" }, [
-    h("div", { cls: "hd" }, [h("a", { href: "#/messages", text: "‹" }), h("a", { cls: "who", href: "#/profil/" + id }, [avEl(pr, 38)]), h("div", { cls: "name", text: pr.name }), h("button", { cls: "xb", type: "button", text: "📞", "aria-label": "Appel vidéo", style: "margin-left:auto;font-size:24px", onclick: startCall })]),
-    msgs,
-    h("div", { cls: "send" }, [inp, send])
-  ]);
-  main.appendChild(card);
+  async function sendRow(row) {
+    row.receiver = id;
+    var r = await sb.from("messages").insert(row);
+    if (r.error) { alert(/media_/.test(r.error.message) ? "Lance d'abord le script SQL de la version 9." : frErr(r.error.message)); return false; }
+    await load(true); msgs.scrollTop = msgs.scrollHeight; return true;
+  }
+  async function doSend() {
+    var t = inp.value.trim(); if (!t) return;
+    inp.value = ""; upd(); emo.classList.add("hide");
+    if (!(await sendRow({ body: t }))) { inp.value = t; upd(); }
+  }
+  fileIn.onchange = async function () {
+    var f = fileIn.files[0]; if (!f) return; fileIn.value = "";
+    try {
+      var url = await upload(await shrink(f, 1080, 0.8), "c-");
+      await sendRow({ body: "📷 Photo", media_url: url, media_type: "image" });
+    } catch (e) { alert(frErr(e.message)); }
+  };
+  /* message vocal */
+  var mr = null, chunks = [], rt = null, t0 = 0;
+  async function startRec() {
+    if (!window.MediaRecorder || !navigator.mediaDevices) { alert("Les messages vocaux ne sont pas disponibles sur ce téléphone."); return; }
+    var st;
+    try { st = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { alert("Autorise le micro pour envoyer un message vocal."); return; }
+    var mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : (MediaRecorder.isTypeSupported("audio/mp4") ? "audio/mp4" : "");
+    mr = new MediaRecorder(st, mime ? { mimeType: mime } : {}); mr._st = st; chunks = [];
+    mr.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+    mr.start(); t0 = Date.now();
+    bar.classList.add("hide"); recb.classList.remove("hide"); recT.textContent = "0:00";
+    rt = setInterval(function () {
+      var s = Math.floor((Date.now() - t0) / 1000);
+      recT.textContent = Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2);
+      if (s >= 120) stopRec(true);
+    }, 500);
+  }
+  function stopRec(doSendIt) {
+    if (!mr) return;
+    clearInterval(rt);
+    var m = mr; mr = null;
+    bar.classList.remove("hide"); recb.classList.add("hide");
+    m.onstop = async function () {
+      m._st.getTracks().forEach(function (t) { t.stop(); });
+      if (!doSendIt || !chunks.length || Date.now() - t0 < 600) return;
+      var type = (m.mimeType || "audio/webm").split(";")[0], blob = new Blob(chunks, { type: type });
+      try {
+        var url = await upload(blob, "a-", /mp4/.test(type) ? "m4a" : "webm", type);
+        await sendRow({ body: "🎤 Message vocal", media_url: url, media_type: "audio" });
+      } catch (e) { alert(frErr(e.message)); }
+    };
+    m.stop();
+  }
+
+  function intro() {
+    var rel = relOf(id), box = h("div", { cls: "intro" });
+    box.appendChild(avEl(pr, 110)); box.appendChild(nm(pr, "inm"));
+    box.appendChild(h("div", { cls: "time", text: rel.state === "friends" ? "Vous êtes amis sur AfriConnect" : "Vous n'êtes pas ami(e)s sur AfriConnect" }));
+    if (pr.bio) box.appendChild(h("div", { cls: "time", text: pr.bio, style: "max-width:300px" }));
+    var acts = h("div", { cls: "fa", style: "justify-content:center;margin-top:12px" });
+    acts.appendChild(h("button", { type: "button", text: "👤 Voir le profil", onclick: function () { location.hash = "#/profil/" + id; } }));
+    if (rel.state === "none") acts.appendChild(h("button", { cls: "p", type: "button", text: "➕ Ajouter", onclick: async function () { await sb.from("friendships").insert({ addressee: id }); await loadFr(); load(true); } }));
+    else if (rel.state === "sent") acts.appendChild(h("button", { type: "button", text: "Invitation envoyée ✓", disabled: "" }));
+    else if (rel.state === "received") acts.appendChild(h("button", { cls: "p", type: "button", text: "✓ Accepter", onclick: async function () { await sb.from("friendships").update({ status: "accepted" }).eq("id", rel.row.id); await loadFr(); load(true); } }));
+    box.appendChild(acts);
+    box.appendChild(h("div", { cls: "time", text: "Cette discussion est privée entre vous deux.", style: "margin-top:16px;max-width:280px" }));
+    return box;
+  }
   var key = "";
-  async function load(force) {
+  async function fetchMsgs() {
     var pair = "and(sender.eq." + me.id + ",receiver.eq." + id + "),and(sender.eq." + id + ",receiver.eq." + me.id + ")";
-    var r = await sb.from("messages").select("id,sender,body,created_at,read").or(pair).order("created_at", { ascending: true }).limit(200);
+    var r = await sb.from("messages").select("id,sender,body,created_at,read,media_url,media_type").or(pair).order("created_at", { ascending: true }).limit(200);
+    if (r.error && /media_/.test(r.error.message)) r = await sb.from("messages").select("id,sender,body,created_at,read").or(pair).order("created_at", { ascending: true }).limit(200);
+    return r;
+  }
+  async function load(force) {
+    var r = await fetchMsgs();
     if (my !== rid || r.error) return;
-    var k = r.data.length + ":" + (r.data.length ? r.data[r.data.length - 1].id : 0);
+    var last = r.data.length ? r.data[r.data.length - 1] : null;
+    var k = r.data.length + ":" + (last ? last.id + ":" + last.read : 0) + ":" + relOf(id).state;
     if (k !== key || force) {
-      var near = msgs.scrollHeight - msgs.scrollTop - msgs.clientHeight < 80 || !key;
+      var near = msgs.scrollHeight - msgs.scrollTop - msgs.clientHeight < 120 || !key;
       key = k; msgs.textContent = "";
-      if (!r.data.length) msgs.appendChild(h("div", { cls: "empty", text: "Dis bonjour à " + pr.name.split(" ")[0] + " 👋" }));
-      r.data.forEach(function (m) {
-        msgs.appendChild(h("div", { cls: "m" + (m.sender === me.id ? " me" : "") }, [linkify(m.body), h("small", { text: ago(m.created_at) })]));
+      msgs.appendChild(intro());
+      r.data.forEach(function (m, i) {
+        var prev = r.data[i - 1];
+        if (!prev || new Date(m.created_at) - new Date(prev.created_at) > 1800000) msgs.appendChild(h("div", { cls: "tm", text: fmtT(m.created_at) }));
+        var mine = m.sender === me.id, b = h("div", { cls: "m" + (mine ? " me" : "") + (m.body === "👍" && !m.media_type ? " big" : "") + (m.media_type === "image" ? " media" : "") });
+        if (m.media_type === "image" && m.media_url) b.appendChild(h("img", { src: m.media_url, alt: "Photo", loading: "lazy", onclick: function () { window.open(m.media_url, "_blank"); } }));
+        else if (m.media_type === "audio" && m.media_url) b.appendChild(h("audio", { src: m.media_url, controls: "", preload: "metadata" }));
+        else b.appendChild(linkify(m.body));
+        msgs.appendChild(b);
       });
+      if (last && last.sender === me.id) msgs.appendChild(h("div", { cls: "stt" }, last.read ? [avEl(pr, 16), document.createTextNode("Vu")] : [document.createTextNode("✓ Envoyé")]));
       if (near) msgs.scrollTop = msgs.scrollHeight;
     }
     if (r.data.some(function (m) { return m.sender === id && !m.read; })) {
@@ -989,16 +1153,6 @@ async function viewChat(main, id) {
       refreshBadges();
     }
   }
-  async function doSend() {
-    var t = inp.value.trim(); if (!t) return;
-    send.disabled = true;
-    var r = await sb.from("messages").insert({ receiver: id, body: t });
-    send.disabled = false;
-    if (r.error) { alert(frErr(r.error.message)); return; }
-    inp.value = ""; await load(true); msgs.scrollTop = msgs.scrollHeight;
-  }
-  send.onclick = doSend;
-  inp.onkeydown = function (e) { if (e.key === "Enter") doSend(); };
   await load(true);
   msgs.scrollTop = msgs.scrollHeight;
   timer = setInterval(function () { if (!document.hidden) load(false); }, 4000);
