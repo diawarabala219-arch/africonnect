@@ -205,6 +205,11 @@ h3.sec{margin:6px 4px 8px;font-size:17px}
 </style>
 </head>
 <body>
+<div id="splash" style="position:fixed;inset:0;z-index:200;background:#1877f2;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-family:system-ui,sans-serif;text-align:center;padding:20px">
+  <div style="font-size:34px;font-weight:800;letter-spacing:.5px">AfriConnect</div>
+  <div id="splashMsg" style="opacity:.9">Chargement…</div>
+  <button id="splashRetry" type="button" style="display:none;background:#fff;color:#1877f2;border:0;border-radius:22px;padding:12px 22px;font-weight:800;font-size:16px" onclick="location.reload()">Réessayer</button>
+</div>
 
 <div id="auth" class="auth hide">
   <div class="card">
@@ -251,7 +256,20 @@ h3.sec{margin:6px 4px 8px;font-size:17px}
 
 <div id="setup" class="auth hide"><div class="card"><div class="logo">AfriConnect</div><p class="sub">La base n'est pas encore reliée.</p></div></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+(function () {
+  var urls = ["https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js", "https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js", "https://cdnjs.cloudflare.com/ajax/libs/supabase-js/2.45.4/umd/supabase.min.js"], i = 0;
+  function next() {
+    if (window.supabase) return go();
+    if (i >= urls.length) { var m = document.getElementById("splashMsg"); if (m) m.textContent = "Connexion trop lente. Vérifie ton réseau puis réessaie."; document.getElementById("splashRetry").style.display = "inline-block"; return; }
+    var sc = document.createElement("script"), t = setTimeout(function () { sc.onerror = sc.onload = null; next(); }, 12000);
+    sc.src = urls[i++]; sc.onload = function () { clearTimeout(t); window.supabase ? go() : next(); }; sc.onerror = function () { clearTimeout(t); next(); };
+    document.head.appendChild(sc);
+  }
+  var started = false; function go() { if (started) return; started = true; window.__afriStart(); }
+  window.__afriReady = next;
+})();
+</script>
 <script>
 var SUPA_URL = "https://edsvhqwetulvypocdjku.supabase.co";
 var SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkc3ZocXdldHVsdnlwb2Nkamt1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzNzQ0OTcsImV4cCI6MjEwODk1MDQ5N30.0opGuYQPIc0hZQlUNlCk9h8kPXD-G4IdaAge2ioiKTM";
@@ -344,6 +362,7 @@ function frErr(m) {
   return m || "Une erreur est survenue.";
 }
 function show(which) {
+  var sp = document.getElementById("splash"); if (sp) sp.remove();
   ["auth", "app", "setup"].forEach(function (k) { $(k).classList.toggle("hide", k !== which); });
 }
 
@@ -1473,27 +1492,4 @@ async function start() {
   $("authForgot").onclick = async function () {
     var mail = $("fMail").value.trim();
     if (!mail) { $("authErr").textContent = "Écris d'abord ton e-mail dans la case ci-dessus."; return; }
-    var r = await sb.auth.resetPasswordForEmail(mail, { redirectTo: location.origin + location.pathname });
-    $("authErr").textContent = r.error ? frErr(r.error.message) : "E-mail envoyé ✓ Ouvre le lien reçu pour choisir un nouveau mot de passe.";
-  };
-  sb.auth.onAuthStateChange(function (ev) {
-    if (ev === "PASSWORD_RECOVERY") {
-      var p = prompt("Choisis ton nouveau mot de passe (6 caractères minimum) :");
-      if (p && p.length >= 6) sb.auth.updateUser({ password: p }).then(function (r) { alert(r.error ? frErr(r.error.message) : "Mot de passe changé ✓"); });
-    }
-  });
-  if ("serviceWorker" in navigator) { try { navigator.serviceWorker.register("sw.js").catch(function () {}); } catch (e) {} }
-  $("mProf").onclick = function () { location.hash = "#/profil"; };
-  $("mRef").onclick = function () { route(); refreshBadges(); };
-  $("mOut").onclick = async function () { await sb.auth.signOut(); me = null; blocked = {}; clearInterval(timer); clearInterval(badgeTimer); clearInterval(callTimer); show("auth"); setMode("login"); };
-  $("bPlus").onclick = function () {
-    if (location.hash && location.hash !== "#/") location.hash = "#/";
-    setTimeout(function () { var p = document.getElementById("pill"); window.scrollTo(0, 0); if (p) p.click(); }, 60);
-  };
-  $("bSearch").onclick = function () {
-    location.hash = "#/membres";
-    setTimeout(function () { var q = document.querySelector("#main input[type=text]"); if (q) q.focus(); }, 300);
-  };
-  window.addEventListener("hashchange", route);
-  var s = await sb.auth.getSession();
-  if (s.data.session) await enter(s.data.session.user); else { show("auth"); setMode("login
+    var r = await sb.auth.resetP
