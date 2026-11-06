@@ -208,7 +208,7 @@ h3.sec{margin:6px 4px 8px;font-size:17px}
 <div id="splash" style="position:fixed;inset:0;z-index:200;background:#1877f2;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-family:system-ui,sans-serif;text-align:center;padding:20px">
   <div style="font-size:34px;font-weight:800;letter-spacing:.5px">AfriConnect</div>
   <div id="splashMsg" style="opacity:.9">Chargement…</div>
-  <div id="splashLog" style="font-size:12px;opacity:.75;max-width:90%;word-break:break-word">v14</div>
+  <div id="splashLog" style="font-size:12px;opacity:.75;max-width:90%;word-break:break-word">v15</div>
   <button id="splashRetry" type="button" style="display:none;background:#fff;color:#1877f2;border:0;border-radius:22px;padding:12px 22px;font-weight:800;font-size:16px" onclick="location.reload()">Réessayer</button>
   <button id="splashReset" type="button" style="display:none;background:transparent;color:#fff;border:1px solid #fff;border-radius:22px;padding:10px 18px;font-weight:700" onclick="try{Object.keys(localStorage).forEach(function(k){if(/^sb-/.test(k))localStorage.removeItem(k)})}catch(e){};location.reload()">Me reconnecter à zéro</button>
 </div>
@@ -259,6 +259,7 @@ h3.sec{margin:6px 4px 8px;font-size:17px}
 <div id="setup" class="auth hide"><div class="card"><div class="logo">AfriConnect</div><p class="sub">La base n'est pas encore reliée.</p></div></div>
 
 <script>
+window.addEventListener("error", function (e) { var l = document.getElementById("splashLog"); if (l) l.textContent += " · ERREUR: " + (e.message || "?") + " (ligne " + e.lineno + ")"; var m = document.getElementById("splashMsg"); if (m) m.textContent = "Une erreur empêche le chargement"; var r = document.getElementById("splashRetry"); if (r) r.style.display = "inline-block"; });
 (function () {
   var urls = ["https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js", "https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js", "https://cdnjs.cloudflare.com/ajax/libs/supabase-js/2.45.4/umd/supabase.min.js"], i = 0;
   function log(t) { var l = document.getElementById("splashLog"); if (l) l.textContent += " · " + t; }
@@ -270,8 +271,9 @@ h3.sec{margin:6px 4px 8px;font-size:17px}
     log("lib" + i); sc.src = urls[i++]; sc.onload = function () { clearTimeout(t); log("ok"); window.supabase ? go() : next(); }; sc.onerror = function () { clearTimeout(t); log("err"); next(); };
     document.head.appendChild(sc);
   }
-  var started = false; function go() { if (started) return; started = true; window.__afriStart(); }
-  window.__afriReady = next;
+  var started = false; function go() { if (started) return; started = true; log("go"); var n = 0, iv = setInterval(function () { if (window.__afriStart) { clearInterval(iv); log("app"); window.__afriStart(); } else if (++n > 100) { clearInterval(iv); log("app-absente"); } }, 100); }
+  window.__afriReady = function () {};
+  next();
 })();
 </script>
 <script>
@@ -1481,12 +1483,4 @@ async function start() {
   sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
   $("authSwitch").onclick = function () { setMode(mode === "login" ? "signup" : "login"); };
   $("authGo").onclick = doAuth;
-  $("fPass").onkeydown = function (e) { if (e.key === "Enter") doAuth(); };
-  var menu = $("menu");
-  $("bMenu").onclick = function (e) { e.stopPropagation(); menu.classList.toggle("hide"); };
-  document.addEventListener("click", function () { menu.classList.add("hide"); });
-  $("fab").onclick = openAI;
-  var dip = null;
-  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); dip = e; $("mInst").classList.remove("hide"); });
-  $("mInst").onclick = async function () { if (dip) { dip.prompt(); await dip.userChoice; dip = null; $("mInst").classList.add("hide"); } };
-  $("mInv").onclick = invite
+  $("fPass").onkeydown = function (e) { 
