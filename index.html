@@ -208,6 +208,7 @@ h3.sec{margin:6px 4px 8px;font-size:17px}
 <div id="splash" style="position:fixed;inset:0;z-index:200;background:#1877f2;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-family:system-ui,sans-serif;text-align:center;padding:20px">
   <div style="font-size:34px;font-weight:800;letter-spacing:.5px">AfriConnect</div>
   <div id="splashMsg" style="opacity:.9">Chargement…</div>
+  <div id="splashLog" style="font-size:12px;opacity:.75;max-width:90%;word-break:break-word">v14</div>
   <button id="splashRetry" type="button" style="display:none;background:#fff;color:#1877f2;border:0;border-radius:22px;padding:12px 22px;font-weight:800;font-size:16px" onclick="location.reload()">Réessayer</button>
   <button id="splashReset" type="button" style="display:none;background:transparent;color:#fff;border:1px solid #fff;border-radius:22px;padding:10px 18px;font-weight:700" onclick="try{Object.keys(localStorage).forEach(function(k){if(/^sb-/.test(k))localStorage.removeItem(k)})}catch(e){};location.reload()">Me reconnecter à zéro</button>
 </div>
@@ -260,11 +261,13 @@ h3.sec{margin:6px 4px 8px;font-size:17px}
 <script>
 (function () {
   var urls = ["https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js", "https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js", "https://cdnjs.cloudflare.com/ajax/libs/supabase-js/2.45.4/umd/supabase.min.js"], i = 0;
+  function log(t) { var l = document.getElementById("splashLog"); if (l) l.textContent += " · " + t; }
+  window.__log = log;
   function next() {
     if (window.supabase) return go();
     if (i >= urls.length) { var m = document.getElementById("splashMsg"); if (m) m.textContent = "Connexion trop lente. Vérifie ton réseau puis réessaie."; document.getElementById("splashRetry").style.display = "inline-block"; return; }
-    var sc = document.createElement("script"), t = setTimeout(function () { sc.onerror = sc.onload = null; next(); }, 12000);
-    sc.src = urls[i++]; sc.onload = function () { clearTimeout(t); window.supabase ? go() : next(); }; sc.onerror = function () { clearTimeout(t); next(); };
+    var sc = document.createElement("script"), t = setTimeout(function () { sc.onerror = sc.onload = null; next(); }, 8000);
+    log("lib" + i); sc.src = urls[i++]; sc.onload = function () { clearTimeout(t); log("ok"); window.supabase ? go() : next(); }; sc.onerror = function () { clearTimeout(t); log("err"); next(); };
     document.head.appendChild(sc);
   }
   var started = false; function go() { if (started) return; started = true; window.__afriStart(); }
@@ -273,7 +276,7 @@ h3.sec{margin:6px 4px 8px;font-size:17px}
 </script>
 <script>
 var SUPA_URL = "https://edsvhqwetulvypocdjku.supabase.co";
-var SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkc3ZocXdldHVsdnlwb2Nkamt1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzNzQ0OTcsImV4cCI6MjEwODk1MDQ5N30.0opGuYQPIc0hZQlUNlCk9h8kPXD-G4IdaAge2ioiKTM";
+var SUPA_KEY = "sb_publishable_W1sRIAhFJ-83OvAVCpqjVQ_UUIeo7Bs";
 var AI_URL = "https://feredou-ia--diawarabala219.replit.app";
 var JITSI = "https://meet.ffmuc.net/";
 
@@ -1474,6 +1477,7 @@ async function viewAlerts(main) {
 /* ---------- Démarrage ---------- */
 async function start() {
   if (!SUPA_URL || !SUPA_KEY || !window.supabase) { show("setup"); return; }
+  window.__log && window.__log("start");
   sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
   $("authSwitch").onclick = function () { setMode(mode === "login" ? "signup" : "login"); };
   $("authGo").onclick = doAuth;
@@ -1485,7 +1489,4 @@ async function start() {
   var dip = null;
   window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); dip = e; $("mInst").classList.remove("hide"); });
   $("mInst").onclick = async function () { if (dip) { dip.prompt(); await dip.userChoice; dip = null; $("mInst").classList.add("hide"); } };
-  $("mInv").onclick = inviteFriends;
-  $("mGrp").onclick = function () { location.hash = "#/groupes"; };
-  $("mMkt").onclick = function () { location.hash = "#/marche"; };
- 
+  $("mInv").onclick = invite
