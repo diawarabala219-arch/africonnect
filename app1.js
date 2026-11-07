@@ -132,6 +132,7 @@ async function enter(user) {
   clearInterval(badgeTimer);
   badgeTimer = setInterval(refreshBadges, 30000);
   clearInterval(callTimer); callTimer = setInterval(checkCalls, 10000); checkCalls();
+  try { AfriCall.init(); } catch (e) {}
 }
 
 /* ---------- Photos ---------- */
