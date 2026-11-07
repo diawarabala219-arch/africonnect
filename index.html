@@ -208,7 +208,7 @@ h3.sec{margin:6px 4px 8px;font-size:17px}
 <div id="splash" style="position:fixed;inset:0;z-index:200;background:#1877f2;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font-family:system-ui,sans-serif;text-align:center;padding:20px">
   <div style="font-size:34px;font-weight:800;letter-spacing:.5px">AfriConnect</div>
   <div id="splashMsg" style="opacity:.9">Chargement…</div>
-  <div id="splashLog" style="font-size:12px;opacity:.75;max-width:90%;word-break:break-word">v16</div>
+  <div id="splashLog" style="font-size:12px;opacity:.75;max-width:90%;word-break:break-word">v17</div>
   <button id="splashRetry" type="button" style="display:none;background:#fff;color:#1877f2;border:0;border-radius:22px;padding:12px 22px;font-weight:800;font-size:16px" onclick="location.reload()">Réessayer</button>
   <button id="splashReset" type="button" style="display:none;background:transparent;color:#fff;border:1px solid #fff;border-radius:22px;padding:10px 18px;font-weight:700" onclick="try{Object.keys(localStorage).forEach(function(k){if(/^sb-/.test(k))localStorage.removeItem(k)})}catch(e){};location.reload()">Me reconnecter à zéro</button>
 </div>
@@ -271,8 +271,8 @@ window.addEventListener("error", function (e) { var l = document.getElementById(
     log("lib" + i); sc.src = urls[i++]; sc.onload = function () { clearTimeout(t); log("ok"); window.supabase ? go() : next(); }; sc.onerror = function () { clearTimeout(t); log("err"); next(); };
     document.head.appendChild(sc);
   }
-  var started = false; function loadApp(list, cb) { if (!list.length) return cb(); var sc = document.createElement("script"); sc.src = list[0]; sc.onload = function () { log("a" + (3 - list.length)); loadApp(list.slice(1), cb); }; sc.onerror = function () { log("fichier-absent:" + list[0]); var m = document.getElementById("splashMsg"); if (m) m.textContent = "Fichier manquant : " + list[0].split("?")[0]; document.getElementById("splashRetry").style.display = "inline-block"; }; document.head.appendChild(sc); }
-  function go() { if (started) return; started = true; log("go"); loadApp(["app1.js?v=16", "app2.js?v=16"], run); }
+  var started = false; function loadApp(list, cb) { if (!list.length) return cb(); var sc = document.createElement("script"); sc.src = list[0]; sc.onload = function () { log("a" + list[0].charAt(3)); loadApp(list.slice(1), cb); }; sc.onerror = function () { log("fichier-absent:" + list[0]); var m = document.getElementById("splashMsg"); if (m) m.textContent = "Fichier manquant : " + list[0].split("?")[0]; document.getElementById("splashRetry").style.display = "inline-block"; }; document.head.appendChild(sc); }
+  function go() { if (started) return; started = true; log("go"); loadApp(["app1.js?v=17", "app2.js?v=17", "app3.js?v=17"], run); }
   function run() { var n = 0, iv = setInterval(function () { if (window.__afriStart) { clearInterval(iv); log("app"); window.__afriStart(); } else if (++n > 100) { clearInterval(iv); log("app-absente"); } }, 100); }
   window.__afriReady = function () {};
   next();
