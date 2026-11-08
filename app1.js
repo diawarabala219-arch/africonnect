@@ -134,6 +134,7 @@ async function enter(user) {
   clearInterval(callTimer); callTimer = setInterval(checkCalls, 10000); checkCalls();
   try { AfriCall.init(); } catch (e) {}
   try { AfriPush.init(); } catch (e) {}
+  try { AfriPresence.init(); } catch (e) {}
 }
 
 /* ---------- Photos ---------- */
@@ -158,7 +159,8 @@ async function upload(blob, tag, ext, ctype) {
   return sb.storage.from("photos").getPublicUrl(path).data.publicUrl;
 }
 async function profRow(id, base) {
-  var r = await sb.from("profiles").select(base + ",phone").eq("id", id).maybeSingle();
+  var r = await sb.from("profiles").select(base + ",phone,last_seen").eq("id", id).maybeSingle();
+  if (r.error) r = await sb.from("profiles").select(base + ",phone").eq("id", id).maybeSingle();
   if (r.error) r = await sb.from("profiles").select(base).eq("id", id).maybeSingle();
   return r;
 }
