@@ -63,3 +63,50 @@ var AfriPush = (function () {
   }
   return { init: init, stop: stop };
 })();
+
+var AfriPresence = (function () {
+  var t = null, on = false;
+  function beat() {
+    if (!me || !sb) return;
+    try { sb.from("profiles").update({ last_seen: new Date().toISOString() }).eq("id", me.id).then(function () {}, function () {}); } catch (e) {}
+  }
+  function vis() { if (document.hidden) beat(); else { beat(); } }
+  function init() {
+    if (on) return; on = true;
+    beat();
+    t = setInterval(function () { if (!document.hidden) beat(); }, 45000);
+    document.addEventListener("visibilitychange", vis);
+    window.addEventListener("pagehide", beat);
+  }
+  function stop() {
+    on = false; if (t) clearInterval(t); t = null;
+    document.removeEventListener("visibilitychange", vis);
+    window.removeEventListener("pagehide", beat);
+    beat();
+  }
+  function isOn(ts) { return !!ts && Date.now() - new Date(ts).getTime() < 100000; }
+  function p2(n) { return (n < 10 ? "0" : "") + n; }
+  function text(ts) {
+    if (!ts) return "";
+    var d = new Date(ts), n = new Date(), diff = n - d;
+    if (diff < 100000) return "En ligne";
+    var hm = p2(d.getHours()) + ":" + p2(d.getMinutes());
+    if (diff < 3600000) return "Actif il y a " + Math.max(2, Math.round(diff / 60000)) + " min";
+    var sd = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+    if (d >= sd) return "Vu aujourd'hui à " + hm;
+    if (d >= new Date(sd - 86400000)) return "Vu hier à " + hm;
+    return "Vu le " + p2(d.getDate()) + "/" + p2(d.getMonth() + 1) + " à " + hm;
+  }
+  function fill(el, ts) {
+    var s = text(ts);
+    el.textContent = s ? (isOn(ts) ? "● " + s : s) : "";
+    el.className = "pst" + (isOn(ts) ? " on" : "");
+  }
+  function avatar(p, size) {
+    var w = h("div", { cls: "avw" }, [avEl(p, size)]);
+    if (p && isOn(p.last_seen)) w.appendChild(h("span", { cls: "on" }));
+    return w;
+  }
+  return { init: init, stop: stop, fill: fill, avatar: avatar, text: text, isOn: isOn };
+})();
+
