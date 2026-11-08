@@ -1,4 +1,4 @@
-const C = "afri-v19";
+const C = "afri-v20";
 self.addEventListener("install", e => { self.skipWaiting(); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(k => Promise.all(k.filter(x => x !== C).map(x => caches.delete(x)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", e => {
@@ -31,3 +31,4 @@ self.addEventListener("notificationclick", e => {
     return self.clients.openWindow(url);
   }));
 });
+
