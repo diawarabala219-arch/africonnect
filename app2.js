@@ -10,7 +10,8 @@ async function viewMembers(main) {
   main.appendChild(h("h3", { cls: "sec", text: "Membres d'AfriConnect" }));
   main.appendChild(card);
   await loadFr();
-  var r = await sb.from("profiles").select("id,name,avatar_url,bio,verified").order("created_at", { ascending: false }).limit(200);
+  var r = await sb.from("profiles").select("id,name,avatar_url,bio,verified,last_seen").order("created_at", { ascending: false }).limit(200);
+  if (r.error) r = await sb.from("profiles").select("id,name,avatar_url,bio,verified").order("created_at", { ascending: false }).limit(200);
   if (my !== rid) return;
   if (r.error) { list.appendChild(h("div", { cls: "empty", text: frErr(r.error.message) })); return; }
   var byId = {}; r.data.forEach(function (m) { byId[m.id] = m; });
@@ -35,7 +36,7 @@ async function viewMembers(main) {
     if (!rows.length) { list.appendChild(h("div", { cls: "empty", text: "Aucun autre membre pour l'instant. Invite tes amis !" })); return; }
     rows.forEach(function (m) {
       list.appendChild(h("div", { cls: "mem" }, [
-        h("a", { cls: "who", href: "#/profil/" + m.id }, [avEl(m, 46)]),
+        h("a", { cls: "who", href: "#/profil/" + m.id }, [AfriPresence.avatar(m, 46)]),
         h("div", { cls: "info" }, [
           h("a", { cls: "who", href: "#/profil/" + m.id }, [nm(m)]),
           h("div", { cls: "bio", text: m.bio || "" }),
@@ -70,13 +71,14 @@ async function viewConvos(main) {
     if (!last[o] && !blocked[o]) { last[o] = m; order.push(o); }
   });
   if (!order.length) { card.appendChild(h("div", { cls: "empty", text: "Aucune conversation. Va dans « Membres » pour écrire à quelqu'un." })); return; }
-  var p = await sb.from("profiles").select("id,name,avatar_url").in("id", order);
+  var p = await sb.from("profiles").select("id,name,avatar_url,last_seen").in("id", order);
+  if (p.error) p = await sb.from("profiles").select("id,name,avatar_url").in("id", order);
   if (my !== rid) return;
   var byId = {}; (p.data || []).forEach(function (x) { byId[x.id] = x; });
   order.forEach(function (o) {
     var m = last[o], pr = byId[o] || { name: "Membre" }, un = m.receiver === me.id && !m.read;
     card.appendChild(h("div", { cls: "conv" + (un ? " un" : ""), onclick: function () { location.hash = "#/messages/" + o; } }, [
-      avEl(pr, 48),
+      AfriPresence.avatar(pr, 48),
       h("div", { cls: "info" }, [h("div", { cls: "name", text: pr.name }), h("div", { cls: "pv", text: (m.sender === me.id ? "Toi : " : "") + m.body })]),
       h("div", { cls: "time", text: ago(m.created_at) }),
       un ? h("div", { cls: "dot" }) : null
@@ -175,8 +177,11 @@ async function viewChat(main, id) {
   recb.appendChild(h("button", { cls: "go2", type: "button", text: "Envoyer ➤", onclick: function () { stopRec(true); } }));
   var back = h("a", { href: "#/messages", text: "‹", style: "font-size:34px;line-height:1;color:var(--brand);text-decoration:none;padding:0 6px" });
   var gear = h("button", { cls: "xb", type: "button", text: "⚙", "aria-label": "Réglages", style: "font-size:26px;color:var(--ink)" });
+  var pst = h("div", { cls: "pst" });
+  function showSt() { try { AfriPresence.fill(pst, pr.last_seen); } catch (e) {} }
+  showSt();
   var card = h("div", { cls: "card chat" }, [
-    h("div", { cls: "hd" }, [back, h("a", { cls: "who", href: "#/profil/" + id }, [avEl(pr, 40)]), nm(pr), h("button", { cls: "xb", type: "button", text: "📞", "aria-label": "Appel vidéo", style: "margin-left:auto;font-size:24px", onclick: startCall }), gear]),
+    h("div", { cls: "hd" }, [back, h("a", { cls: "who", href: "#/profil/" + id }, [avEl(pr, 40)]), h("div", { style: "min-width:0;display:flex;flex-direction:column" }, [nm(pr), pst]), h("button", { cls: "xb", type: "button", text: "📞", "aria-label": "Appel vidéo", style: "margin-left:auto;font-size:24px", onclick: startCall }), gear]),
     msgs, emo, h("div", { id: "mfoot" }, [bar, recb])
   ]);
   main.appendChild(card);
@@ -315,7 +320,16 @@ async function viewChat(main, id) {
   }
   await load(true);
   msgs.scrollTop = msgs.scrollHeight;
-  timer = setInterval(function () { if (!document.hidden) load(false); }, 4000);
+  var tick = 0;
+  timer = setInterval(async function () {
+    if (document.hidden) return;
+    load(false);
+    tick++;
+    if (tick % 5 === 0) {
+      try { var q = await sb.from("profiles").select("last_seen").eq("id", id).maybeSingle(); if (q.data) pr.last_seen = q.data.last_seen; } catch (e) {}
+    }
+    showSt();
+  }, 4000);
 }
 
 /* ---------- Groupes et pages ---------- */
@@ -602,7 +616,7 @@ async function start() {
   if ("serviceWorker" in navigator) { try { navigator.serviceWorker.register("sw.js").catch(function () {}); } catch (e) {} }
   $("mProf").onclick = function () { location.hash = "#/profil"; };
   $("mRef").onclick = function () { route(); refreshBadges(); };
-  $("mOut").onclick = async function () { try { await AfriPush.stop(); } catch (e) {} await sb.auth.signOut(); me = null; blocked = {}; clearInterval(timer); clearInterval(badgeTimer); clearInterval(callTimer); try { AfriCall.stop(); } catch (e) {} show("auth"); setMode("login"); };
+  $("mOut").onclick = async function () { try { await AfriPush.stop(); try { AfriPresence.stop(); } catch (e) {}; } catch (e) {} await sb.auth.signOut(); me = null; blocked = {}; clearInterval(timer); clearInterval(badgeTimer); clearInterval(callTimer); try { AfriCall.stop(); } catch (e) {} show("auth"); setMode("login"); };
   $("bPlus").onclick = function () {
     if (location.hash && location.hash !== "#/") location.hash = "#/";
     setTimeout(function () { var p = document.getElementById("pill"); window.scrollTo(0, 0); if (p) p.click(); }, 60);
